@@ -1,13 +1,25 @@
-If you know of a key combination that executes the command you want, you may enter "sublime.log_commands(True)" in the console.
-Then press the appropriate key binding. This will print out the command being executed to the console and the associated arguments.
+Tipps:
 
+1. If you know of a key combination that executes the command you want, you may enter "sublime.log_commands(True)" in the console. Then press the appropriate key binding. This will print out the command being executed to the console and the associated arguments.
 
-my own key bindings:
+-----
+
+2. As the german keyboard is layed out somewhat differently than an English one, many of the shortcuts triggered by non-alphanumeric characters are not in the right corresponding german position.
+
+Here I list all correspondences I have found out till now:
+
+Ctrl + `  -->  Ctrl + Ö
+Ctrl + ;  -->  Ctrl + Ü
+Ctrl + /  -->  Ctrl + #
+
+_______________________________________________________________________________
+
+My own key bindings:
 
 [
-    {"keys": ["ctrl+shift+b"], "command": "cancel_build" },
-    // { "keys": ["ctrl+<"], "command": "show_panel", "args": {"panel": "console", "toggle": true} },
-    { "keys": ["alt+space"], "command": "move_to", "args": {"to": "bol", "extend": false} },
-    { "keys": ["shift+space"], "command": "move_to", "args": {"to": "eol", "extend": false} }
+    { "keys": ["ctrl+shift+b"], "command": "cancel_build" },
+    { "keys": ["alt+space"], "command": "move_to", "args": {"to": "eol", "extend": false} },
+    { "keys": ["alt+shift+space"], "command": "move_to", "args": {"to": "bol", "extend": false} }
 ]
+
 
