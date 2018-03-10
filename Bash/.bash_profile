@@ -6,8 +6,8 @@ source ~/bash-scripts/git-prompt.sh
 
 # colors
 red="\e[0;1;31m"
-yellow="\e[0;1;33m"
 orange="\e[0;38;5;172m"
+yellow="\e[0;1;33m"
 green="\e[0;1;32m"
 cyan="\e[0;1;36m"
 white="\e[0;97m"
@@ -21,5 +21,5 @@ trap 'echo -n -e "$reset"' DEBUG
 # '\H' adds the full hostname to the prompt
 # '\$(__git_ps1)' git status prompt (generates a space before it even if empty)
 # '\w' adds the name of the current directory
-export PS1="\[$red\]\u\[$yellow\]@\[$orange\]\H\[$green\]\$(__git_ps1) \[$cyan\]\w
+export PS1="\[$red\]\u\[$orange\]@\[$yellow\]\H \[$green\]\w \[$cyan\]\$(__git_ps1)
 \[$white\]$ "
