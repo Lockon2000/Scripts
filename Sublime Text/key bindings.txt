@@ -17,9 +17,13 @@ _______________________________________________________________________________
 My own key bindings:
 
 [
+    // Ctrl + Shift + b --> Cancel Build
     { "keys": ["ctrl+shift+b"], "command": "cancel_build" },
+    // Alt + Space --> Go to end of line
     { "keys": ["alt+space"], "command": "move_to", "args": {"to": "eol", "extend": false} },
+    // Alt + Shift + Space --> Go to beginnig of line
     { "keys": ["alt+shift+space"], "command": "move_to", "args": {"to": "bol", "extend": false} }
 ]
+
 
 
