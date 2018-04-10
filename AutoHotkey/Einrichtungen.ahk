@@ -20,8 +20,6 @@ F4:: Suspend
 ^!p::
 #IfWinActive ahk_class ExploreWClass
 ^!p::
-#IfWinActive ahk_class Progman
-^!p::
     ; Get full path from open Explorer window
     WinGetText, FullPath, A
 
@@ -54,6 +52,8 @@ F4:: Suspend
 
     Return
 
+#IfWinActive ahk_class Progman
+^!p::
 #IfWinActive ahk_class WorkerW
 ^!p::
     ; Open the file in the appropriate editor
@@ -70,8 +70,6 @@ F4:: Suspend
 #IfWinActive ahk_class CabinetWClass
 ^!n::
 #IfWinActive ahk_class ExploreWClass
-^!n::
-#IfWinActive ahk_class Progman
 ^!n::
     ; Get full path from open Explorer window
     WinGetText, FullPath, A
@@ -115,6 +113,8 @@ F4:: Suspend
 
     Return
 
+#IfWinActive ahk_class Progman
+^!n::
 #IfWinActive ahk_class WorkerW
 ^!n::
     ; Change working directory
@@ -150,7 +150,7 @@ F4:: Suspend
 ; ^!1::
 ;     WinGetClass, t, A
 ;     MsgBox, %t%
-;
+; 
 ;     return
 
 
