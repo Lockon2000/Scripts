@@ -1,0 +1,13 @@
+{
+    "auto_complete_commit_on_tab": true,
+    "color_scheme": "Packages/Color Scheme - Default/Monokai.tmTheme",
+    "font_size": 9,
+    "hot_exit": false,
+    "ignored_packages":
+    [
+        "Vintage"
+    ],
+    "show_encoding": true,
+    "theme": "Adaptive.sublime-theme",
+    "translate_tabs_to_spaces": true
+}

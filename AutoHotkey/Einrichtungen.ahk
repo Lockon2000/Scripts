@@ -4,18 +4,27 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; ---------------------------------------------------------------------
 
+; +----------------------------------------------------------------------+
+; | F4: Hotkey to suspend the script                                     |
+; | Alt+W: Pin the active window on top of any other window              |
+; | Ctrl+Alt+P: Hotkey to launch PowerShell in Admin mode                |
+; | Ctrl+Alt+N: Create a new file and run it with the associated program |
+; |----------------------------------------------------------------------|
+; | Ctrl+Alt+1                                                           |
+; | Ctrl+Alt+2                                                           |
+; +----------------------------------------------------------------------+
+
+
 ; Hotkey to suspend the script
 F4:: Suspend
 
 
 ; Pin the active window on top of any other window
-; Alt+W
 !w:: Winset, Alwaysontop, TOGGLE, A
 
 
 ; Hotkey to launch PowerShell in Admin mode
 ; Only run when Windows Explorer or Desktop is active
-; Ctrl+Alt+P
 #IfWinActive ahk_class CabinetWClass
 ^!p::
 #IfWinActive ahk_class ExploreWClass
@@ -66,7 +75,6 @@ F4:: Suspend
 
 ; Create a new file and run it with the associated program
 ; Only run when Windows Explorer or Desktop is active
-; Ctrl+Alt+N
 #IfWinActive ahk_class CabinetWClass
 ^!n::
 #IfWinActive ahk_class ExploreWClass
@@ -144,7 +152,7 @@ F4:: Suspend
 
 ;------------------------------------------------------------------
 ; Tools for developing
-; Only uncomment whene needed
+; Only uncomment when needed
 
 ; Print the AHK_Class of the active Window in a Massege Box
 ; ^!1::
@@ -154,7 +162,7 @@ F4:: Suspend
 ;     return
 
 
-; Print the AHK_Class of the active Window in a Massege Box
+; Print the current username in a Massege Box
 ; ^!2::
 ;     MsgBox, %A_UserName%
 ; 
