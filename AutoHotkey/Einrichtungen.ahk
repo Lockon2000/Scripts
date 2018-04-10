@@ -57,7 +57,7 @@ F4:: Suspend
 #IfWinActive ahk_class WorkerW
 ^!p::
     ; Open the file in the appropriate editor
-    Run *RunAs C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -NoExit -Command "Set-Location 'C:\Users\Kerberus\Desktop'"
+    Run *RunAs C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -NoExit -Command "Set-Location 'C:\Users\%A_UserName%\Desktop'"
 
     Return
 
@@ -118,7 +118,7 @@ F4:: Suspend
 #IfWinActive ahk_class WorkerW
 ^!n::
     ; Change working directory
-    SetWorkingDir, C:\Users\Kerberus\Desktop
+    SetWorkingDir, C:\Users\%A_UserName%\Desktop
 
     ; An error occurred with the SetWorkingDir directive
     If ErrorLevel
@@ -150,5 +150,13 @@ F4:: Suspend
 ; ^!1::
 ;     WinGetClass, t, A
 ;     MsgBox, %t%
-
+;
 ;     return
+
+
+; Print the AHK_Class of the active Window in a Massege Box
+; ^!2::
+;     MsgBox, %A_UserName%
+; 
+;     return
+
