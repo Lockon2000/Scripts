@@ -23,3 +23,5 @@ trap 'echo -n -e "$reset"' DEBUG
 # '\w' adds the name of the current directory
 export PS1="\[$red\]\u\[$orange\]@\[$yellow\]\H \[$green\]\w \[$cyan\]\$(__git_ps1)
 \[$white\]$ "
+
+alias l="ls -la"
