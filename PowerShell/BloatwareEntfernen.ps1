@@ -5,56 +5,29 @@ If (-Not $CurrentlyAdmin)
     Exit
 }
 
-Get-AppxPackage 64885BlueEdge.OneCalendar | Remove-AppxPackage
-Get-AppxPackage A278AB0D.DisneyMagicKingdoms | Remove-AppxPackage
-Get-AppxPackage A278AB0D.MarchofEmpires | Remove-AppxPackage
-Get-AppxPackage DolbyLaboratories.DolbyAccess | Remove-AppxPackage
-Get-AppxPackage Microsoft.BingNews | Remove-AppxPackage
-Get-AppxPackage Microsoft.BingWeather | Remove-AppxPackage
-Get-AppxPackage Microsoft.BingWeather | Remove-AppxPackage
-Get-AppxPackage Microsoft.GetHelp | Remove-AppxPackage
-Get-AppxPackage Microsoft.MSPaint | Remove-AppxPackage
-Get-AppxPackage Microsoft.Messaging | Remove-AppxPackage
-Get-AppxPackage Microsoft.Microsoft3DViewer | Remove-AppxPackage
-Get-AppxPackage Microsoft.MicrosoftOfficeHub | Remove-AppxPackage
-Get-AppxPackage Microsoft.MicrosoftSolitaireCollection | Remove-AppxPackage
-Get-AppxPackage Microsoft.Office.OneNote | Remove-AppxPackage
-Get-AppxPackage Microsoft.OneConnect | Remove-AppxPackage
-Get-AppxPackage Microsoft.People | Remove-AppxPackage
-Get-AppxPackage Microsoft.Print3D | Remove-AppxPackage
-Get-AppxPackage Microsoft.SkypeApp | Remove-AppxPackage
-Get-AppxPackage Microsoft.Wallet | Remove-AppxPackage
-Get-AppxPackage Microsoft.WindowsCalculator | Remove-AppxPackage
-Get-AppxPackage Microsoft.WindowsFeedbackHub | Remove-AppxPackage
-Get-AppxPackage Microsoft.Xbox.TCUI | Remove-AppxPackage
-Get-AppxPackage Microsoft.XboxApp | Remove-AppxPackage
-Get-AppxPackage Microsoft.XboxApp | Remove-AppxPackage
-Get-AppxPackage Microsoft.XboxGameOverlay | Remove-AppxPackage
-Get-AppxPackage Microsoft.XboxIdentityProvider | Remove-AppxPackage
-Get-AppxPackage Microsoft.XboxSpeechToTextOverlay | Remove-AppxPackage
-Get-AppxPackage Microsoft.ZuneMusic | Remove-AppxPackage
-Get-AppxPackage Microsoft.ZuneVideo | Remove-AppxPackage
-Get-AppxPackage XINGAG.XING | Remove-AppxPackage
-Get-AppxPackage king.com.BubbleWitch3Saga | Remove-AppxPackage
-Get-AppxPackage king.com.CandyCrushSodaSaga | Remove-AppxPackage
+$packages = "*A278AB0D*","*Duolingo*","*king.com*","46928bounde.EclipseManager","64885BlueEdge.OneCalendar","AdobeSystemsIncorporated.AdobePhotoshopExpress","DolbyLaboratories.DolbyAccess",
+"Microsoft.BingNews","Microsoft.BingTranslator","Microsoft.BingWeather","Microsoft.GetHelp","Microsoft.Messaging","Microsoft.Microsoft3DViewer","Microsoft.MicrosoftOfficeHub",
+"Microsoft.MicrosoftSolitaireCollection","Microsoft.MSPaint","Microsoft.Office.OneNote","Microsoft.Office.Sway","Microsoft.OneConnect","Microsoft.People","Microsoft.Print3D","Microsoft.SkypeApp",
+"Microsoft.Wallet","Microsoft.WindowsCalculator","Microsoft.WindowsFeedbackHub","Microsoft.Xbox.TCUI","Microsoft.XboxApp","Microsoft.XboxApp","Microsoft.XboxGameOverlay","Microsoft.XboxIdentityProvider",
+"Microsoft.XboxSpeechToTextOverlay","Microsoft.ZuneMusic","Microsoft.ZuneVideo","XINGAG.XING","Microsoft.NetworkSpeedTest"
 
+Write-Output "Deinstalliere App-Packete"
 
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.BingWeather*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.Messaging*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.Microsoft3DViewer*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.MicrosoftSolitaireCollection*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.Office.OneNote*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.Print3D*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.Wallet*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.WindowsFeedbackHub*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.Xbox.TCUI*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.XboxApp*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.XboxGameOverlay*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.XboxIdentityProvider*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.XboxSpeechToTextOverlay*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.ZuneMusic*"} | remove-appxprovisionedpackage –online *>$null
-Get-appxprovisionedpackage –online | where-object {$_.packagename –like "*Microsoft.ZuneVideo*"} | remove-appxprovisionedpackage –online *>$null
+foreach ($p in $packages) {
+$job = Start-Job {param($p); Get-AppxPackage $p | Remove-AppxPackage } -ArgumentList $p
+Wait-Job $job
+Write-Output (Receive-Job $job)
+}
 
+$provisions = "*Microsoft.BingWeather*","*Microsoft.Messaging*","*Microsoft.Microsoft3DViewer*","*Microsoft.MicrosoftSolitaireCollection*","*Microsoft.Office.OneNote*","*Microsoft.Print3D*","*Microsoft.MSPaint*",
+"*Microsoft.Wallet*","*Microsoft.WindowsFeedbackHub*","*Microsoft.Xbox.TCUI*","*Microsoft.XboxApp*","*Microsoft.XboxGameOverlay*","*Microsoft.XboxIdentityProvider*","*Microsoft.XboxSpeechToTextOverlay*",
+"*Microsoft.ZuneMusic*","*Microsoft.ZuneVideo*"
+
+Write-Output "Deinstalliere App-Provisionen"
+
+foreach ($p in $provisions) {
+Get-appxprovisionedpackage –online | where-object {$_.packagename –like $p} | remove-appxprovisionedpackage –online *>$null
+}
 
 Write-Output "Fertig!"
 Pause
