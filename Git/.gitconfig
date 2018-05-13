@@ -1,16 +1,6 @@
-[core]
-	editor = 'c:/program files/sublime text 3/subl.exe' -w
 [user]
-	name = Lockon2000
-	email = m.taha2000@outlook.de
-[color]
-	ui = auto
-[merge]
-	conflictstyle = diff3
-[winUpdater]
-	recentlySeenVersion = 2.15.1.windows.2
+    name = Lockon2000
+    email = m.taha2000@outlook.de
 [alias]
-lg0 = log --oneline --graph --all
-lg1 = log --graph --all --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)'
-[credential]
-	helper = wincred
+    lg0 = log --oneline --graph --all
+    lg1 = log --graph --all --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)'
