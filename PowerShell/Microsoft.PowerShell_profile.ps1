@@ -10,3 +10,5 @@ function prompt {
 }
 
 New-Alias -Name sublime -Value "C:\Program Files\Sublime Text 3\sublime_text.exe"
+New-Alias -Name m -Value more
+New-Alias -Name less -Value more
