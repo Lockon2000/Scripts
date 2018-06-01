@@ -5,11 +5,14 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; ---------------------------------------------------------------------
 
 ; +----------------------------------------------------------------------+
+; | ** Daily Hotkeys **                                                  |
 ; | F4: Hotkey to suspend the script                                     |
 ; | Alt+W: Pin the active window on top of any other window              |
 ; | Ctrl+Alt+P: Hotkey to launch PowerShell in Admin mode                |
 ; | Ctrl+Alt+N: Create a new file and run it with the associated program |
+; | Ctrl+Alt+S: Open clipboard with Sublime Text                         |
 ; |----------------------------------------------------------------------|
+; | ** Debungging Hotkeys **                                             |
 ; | Ctrl+Alt+1                                                           |
 ; | Ctrl+Alt+2                                                           |
 ; +----------------------------------------------------------------------+
@@ -29,6 +32,7 @@ F4:: Suspend
 ^!p::
 #IfWinActive ahk_class ExploreWClass
 ^!p::
+    ; Begin (get current path) -------------
     ; Get full path from open Explorer window
     WinGetText, FullPath, A
 
@@ -48,6 +52,7 @@ F4:: Suspend
     ; Clean up result
     FullPath := RegExReplace(FullPath, "(^.+?: )", "")
     StringReplace, FullPath, FullPath, `r, , all
+    ; End (get current paht) -------------
 
     ; Change working directory
     SetWorkingDir, %FullPath%
@@ -79,6 +84,7 @@ F4:: Suspend
 ^!n::
 #IfWinActive ahk_class ExploreWClass
 ^!n::
+    ; Begin (get current path) -------------
     ; Get full path from open Explorer window
     WinGetText, FullPath, A
 
@@ -98,6 +104,7 @@ F4:: Suspend
     ; Clean up result
     FullPath := RegExReplace(FullPath, "(^.+?: )", "")
     StringReplace, FullPath, FullPath, `r, , all
+    ; End (get current paht) -------------
 
     ; Change working directory
     SetWorkingDir, %FullPath%
@@ -150,21 +157,56 @@ F4:: Suspend
 #IfWinActive
 
 
+; Ctrl+Alt+S: Open clipboard with Sublime Text
+; Only run when Windows Explorer or Desktop is active
+#IfWinActive ahk_class CabinetWClass
+^!s::
+#IfWinActive ahk_class ExploreWClass
+^!s::
+#IfWinActive ahk_class Progman
+^!s::
+#IfWinActive ahk_class WorkerW
+^!s::
+    clipboard =     ; Empty the clipboard
+    Send, ^c        ; Populate the clipboard with the focused files name
+    ClipWait, 0.5   ; Wait up to 0.5 seconds for the clipboard to have content
+    if ErrorLevel
+    {
+        MsgBox, The attempt to copy text onto the clipboard failed.
+        return
+    }
+    clipboard := StrReplace(clipboard, "`r`n", A_space)     ; For the case of multiselection
+    Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %clipboard%
+    return
+
+#IfWinActive
+
+
+
 ;------------------------------------------------------------------
 ; Tools for developing
 ; Only uncomment when needed
 
-; Print the AHK_Class of the active Window in a Massege Box
 ; ^!1::
-;     WinGetClass, t, A
-;     MsgBox, %t%
-; 
+;     clipboard = 
+;     Send, ^c
+;     ClipWait ;waits for the clipboard to have content
+;     Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %clipboard%
+
 ;     return
 
 
-; Print the current username in a Massege Box
 ; ^!2::
-;     MsgBox, %A_UserName%
-; 
+;     clipboard =     ; Empty the clipboard
+;     Send, ^c        ; Populate the clipboard with the focused files name
+;     ClipWait, 0.5   ; Wait up to 0.5 seconds for the clipboard to have content
+;     if ErrorLevel
+;     {
+;         MsgBox, The attempt to copy text onto the clipboard failed.
+;         return
+;     }
+;     clipboard := StrReplace(clipboard, "`r`n", A_space)
+;     MsgBox, %clipboard%
+
 ;     return
 
