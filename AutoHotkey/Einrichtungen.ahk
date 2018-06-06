@@ -58,7 +58,7 @@ F4:: Suspend
     SetWorkingDir, %FullPath%
 
     ; An error occurred with the SetWorkingDir directive
-    If ErrorLevel
+    if ErrorLevel
         Return
 
     ; Open the file in the appropriate editor
@@ -112,17 +112,17 @@ F4:: Suspend
     SetWorkingDir, %FullPath%
 
     ; An error occurred with the SetWorkingDir directive
-    If ErrorLevel
+    if ErrorLevel
         Return
 
     ; Display input box for filename
     InputBox, UserInput, New File, , , 400, 100, , , , ,
 
     ; User pressed cancel
-    If ErrorLevel
+    if ErrorLevel
         Return
 
-    If InStr(UserInput, " -s") {
+    if InStr(UserInput, " -s") {
         ; Strip UserInput of the -s option
         UserInput := StrReplace(UserInput, " -s", "")
 
@@ -131,7 +131,13 @@ F4:: Suspend
 
         ; Open the file in Sublime Text
         Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %UserInput%
-    } Else {
+    } else if InStr(UserInput, " -c") {
+        ; Strip UserInput of the -s option
+        UserInput := StrReplace(UserInput, " -c", "")
+
+        ; Create file
+        FileAppend, , %UserInput%
+    } else {
         ; Create file
         FileAppend, , %UserInput%
 
@@ -159,7 +165,7 @@ F4:: Suspend
     If ErrorLevel
         Return
 
-    If InStr(UserInput, " -s") {
+    if InStr(UserInput, " -s") {
         ; Strip UserInput of the -s option
         UserInput := StrReplace(UserInput, " -s", "")
 
@@ -168,7 +174,13 @@ F4:: Suspend
 
         ; Open the file in Sublime Text
         Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %UserInput%
-    } Else {
+    } else if InStr(UserInput, " -c") {
+        ; Strip UserInput of the -s option
+        UserInput := StrReplace(UserInput, " -c", "")
+
+        ; Create file
+        FileAppend, , %UserInput%
+    } else {
         ; Create file
         FileAppend, , %UserInput%
 
