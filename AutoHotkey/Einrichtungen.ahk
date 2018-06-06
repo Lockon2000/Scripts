@@ -122,9 +122,9 @@ F4:: Suspend
     If ErrorLevel
         Return
 
-    If InStr(UserInput, "-s") {
+    If InStr(UserInput, " -s") {
         ; Strip UserInput of the -s option
-        UserInput := StrReplace(UserInput, "-s", "")
+        UserInput := StrReplace(UserInput, " -s", "")
 
         ; Create file
         FileAppend, , %UserInput%
@@ -159,9 +159,9 @@ F4:: Suspend
     If ErrorLevel
         Return
 
-    If InStr(UserInput, "-s") {
+    If InStr(UserInput, " -s") {
         ; Strip UserInput of the -s option
-        UserInput := StrReplace(UserInput, "-s", "")
+        UserInput := StrReplace(UserInput, " -s", "")
 
         ; Create file
         FileAppend, , %UserInput%
