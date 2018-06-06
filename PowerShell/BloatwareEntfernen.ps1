@@ -18,8 +18,7 @@ foreach ($p in $packages) {
     if (-not (Get-AppxPackage $p)) {
         Write-Progress -Activity "Deinstalliere App-Packete" -Status (([math]::Round($i/$packages.count*100)).toString()+"% Complete:") -PercentComplete ($i/$packages.count*100) -CurrentOperation "Deinstalliere $p"
         $i++
-    }
-    else {
+    } else {
         $notuninstalled += $p
     }
 }
@@ -37,8 +36,7 @@ foreach ($p in $provisions) {
     if (-not (Get-appxprovisionedpackage –online | where-object {$_.packagename –like $p})) {
         Write-Progress -Activity "Deinstalliere App-Provisionen" -Status (([math]::Round($i/$provisions.count*100)).toString()+"% Complete:") -PercentComplete ($i/$provisions.count*100) -CurrentOperation "Deinstalliere $p"
         $i++
-    }
-    else {
+    } else {
         $notuninstalled += $p
     }
 }
@@ -50,10 +48,9 @@ if ($notuninstalled) {
 Write-Output "Deinstallation von App-Provisionen fertig"
 
 function Pin-App {
-    param(
-        [parameter(mandatory=$true)][ValidateNotNullOrEmpty()][string[]]$appname,
-        [switch]$unpin
-    )
+    param([parameter(mandatory=$true)][ValidateNotNullOrEmpty()][string[]]$appname,
+        [switch]$unpin)
+
     $actionstring = @{$true='Von "Start" lösen|Unpin from Start';$false='An "Start" anheften|Pin to Start'}[$unpin.IsPresent]
     $action = @{$true='unpinned from';$false='pinned to'}[$unpin.IsPresent]
     $apps = (New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items() | ?{$_.Name -in $appname}
@@ -62,15 +59,15 @@ function Pin-App {
         $notfound = compare $appname $apps.Name -PassThru
         if ($notfound){write-error "These App(s) were not found: $($notfound -join ",")"}
 
-        foreach ($app in $apps){
+        foreach ($app in $apps) {
             $appaction = $app.Verbs() | ?{$_.Name.replace('&','') -match $actionstring}
-            if ($appaction){
+            if ($appaction) {
                 $appaction | %{$_.DoIt(); return "App '$($app.Name)' $action Start"}
-            }else{
+            } else {
                 write-error "App '$($app.Name)' is already pinned to start or action not supported."
             }
         }
-    }else{
+    } else {
         write-error "App(s) not found: $($appname -join ",")"
     }
 }

@@ -80,6 +80,8 @@ F4:: Suspend
 
 ; Create a new file and run it with the associated program
 ; Only run when Windows Explorer or Desktop is active
+; Options:
+; -s    to open the created file with sublime text regardless of its associated program
 #IfWinActive ahk_class CabinetWClass
 ^!n::
 #IfWinActive ahk_class ExploreWClass
@@ -120,11 +122,22 @@ F4:: Suspend
     If ErrorLevel
         Return
 
-    ; Create file
-    FileAppend, , %UserInput%
+    If InStr(UserInput, "-s") {
+        ; Strip UserInput of the -s option
+        UserInput := StrReplace(UserInput, "-s", "")
 
-    ; Open the file in the appropriate editor
-    Run %UserInput%
+        ; Create file
+        FileAppend, , %UserInput%
+
+        ; Open the file in Sublime Text
+        Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %UserInput%
+    } Else {
+        ; Create file
+        FileAppend, , %UserInput%
+
+        ; Open the file in the associated program
+        Run, %UserInput%
+    }
 
     Return
 
@@ -146,11 +159,22 @@ F4:: Suspend
     If ErrorLevel
         Return
 
-    ; Create file
-    FileAppend, , %UserInput%
+    If InStr(UserInput, "-s") {
+        ; Strip UserInput of the -s option
+        UserInput := StrReplace(UserInput, "-s", "")
 
-    ; Open the file in the appropriate editor
-    Run %UserInput%
+        ; Create file
+        FileAppend, , %UserInput%
+
+        ; Open the file in Sublime Text
+        Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %UserInput%
+    } Else {
+        ; Create file
+        FileAppend, , %UserInput%
+
+        ; Open the file in the associated program
+        Run, %UserInput%
+    }
 
     Return
 
