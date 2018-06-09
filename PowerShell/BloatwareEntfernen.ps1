@@ -7,21 +7,32 @@ If (-Not $CurrentlyAdmin)
     Exit
 }
 # ---------------------------
+# Disable Microsoft Consumer Experience
+
+Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\ -Name DisableWindowsConsumerFeatures -Value 0
+if (Test-Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\) {
+    Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\ -Name DisableWindowsConsumerFeatures -Value 1
+} else {
+    New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\ -Name CloudContent
+    Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\ -Name DisableWindowsConsumerFeatures -Value 1
+}
+Write-Output "Microsoft Consumer Experience deaktiviert"
+# ---------------------------
 # Uninstall Apps
 
-$packagesToSpareNamed = "Microsoft.WebMediaExtensions","Microsoft.Win32WebViewHost","Microsoft.Windows.CloudExperienceHost","Microsoft.AAD.BrokerPlugin","Microsoft.Windows.ShellExperienceHost","windows.immersivecontrolpanel","Microsoft.Windows.Cortana","Microsoft.MicrosoftEdge","Microsoft.Windows.ContentDeliveryManager","microsoft.windowscommunicationsapps","Microsoft.VCLibs.140.00","Microsoft.VCLibs.140.00","Microsoft.Windows.Photos","Microsoft.NET.Native.Framework.1.3","Microsoft.NET.Native.Framework.1.3","Microsoft.NET.Native.Runtime.1.4","Microsoft.NET.Native.Runtime.1.4","Microsoft.WindowsStore","Microsoft.WindowsCamera","Microsoft.NET.Native.Framework.1.6","Microsoft.NET.Native.Framework.1.6","Microsoft.NET.Native.Runtime.1.6","Microsoft.NET.Native.Runtime.1.6","Microsoft.NET.Native.Runtime.1.3","Microsoft.NET.Native.Runtime.1.3","Windows.PrintDialog","Microsoft.Windows.SecureAssessmentBrowser","Microsoft.Windows.SecondaryTileExperience","Microsoft.Windows.SecHealthUI","Microsoft.Windows.PinningConfirmationDialog","Microsoft.Windows.Apprep.ChxApp","Microsoft.Windows.AssignedAccessLockApp","Microsoft.LockApp","Microsoft.Windows.OOBENetworkCaptivePortal","Microsoft.PPIProjection","Microsoft.Windows.HolographicFirstRun","Microsoft.AccountsControl","Microsoft.Windows.ParentalControls","Microsoft.Windows.OOBENetworkConnectionFlow","Microsoft.Windows.PeopleExperienceHost","Microsoft.CredDialogHost","Microsoft.WindowsAlarms","Microsoft.SkypeApp","Microsoft.WindowsSoundRecorder","Microsoft.WindowsMaps","Microsoft.WindowsCalculator","Microsoft.StorePurchaseApp","Microsoft.Office.OneNote","Microsoft.MSPaint","Microsoft.MicrosoftStickyNotes","Microsoft.Services.Store.Engagement","Microsoft.Services.Store.Engagement","Microsoft.DesktopAppInstaller","Microsoft.Advertising.Xaml","Microsoft.Advertising.Xaml","Microsoft.XboxGameCallableUI","1527c705-839a-4832-9118-54d4Bd6a0c89","c5e2524a-ea46-4f67-841f-6a9465d9d515","E2A4F912-2574-4A75-9BB0-0D023378592B","F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE","InputApp","Microsoft.ECApp","Microsoft.BioEnrollment"
+$packagesToSpareNamed = "Microsoft.RemoteDesktop","Microsoft.WebMediaExtensions","Microsoft.Win32WebViewHost","Microsoft.Windows.CloudExperienceHost","Microsoft.AAD.BrokerPlugin","Microsoft.Windows.ShellExperienceHost","windows.immersivecontrolpanel","Microsoft.Windows.Cortana","Microsoft.MicrosoftEdge","Microsoft.Windows.ContentDeliveryManager","microsoft.windowscommunicationsapps","Microsoft.VCLibs.140.00","Microsoft.VCLibs.140.00","Microsoft.Windows.Photos","Microsoft.NET.Native.Framework.1.3","Microsoft.NET.Native.Framework.1.3","Microsoft.NET.Native.Runtime.1.4","Microsoft.NET.Native.Runtime.1.4","Microsoft.WindowsStore","Microsoft.WindowsCamera","Microsoft.NET.Native.Framework.1.6","Microsoft.NET.Native.Framework.1.6","Microsoft.NET.Native.Runtime.1.6","Microsoft.NET.Native.Runtime.1.6","Microsoft.NET.Native.Runtime.1.3","Microsoft.NET.Native.Runtime.1.3","Windows.PrintDialog","Microsoft.Windows.SecureAssessmentBrowser","Microsoft.Windows.SecondaryTileExperience","Microsoft.Windows.SecHealthUI","Microsoft.Windows.PinningConfirmationDialog","Microsoft.Windows.Apprep.ChxApp","Microsoft.Windows.AssignedAccessLockApp","Microsoft.LockApp","Microsoft.Windows.OOBENetworkCaptivePortal","Microsoft.PPIProjection","Microsoft.Windows.HolographicFirstRun","Microsoft.AccountsControl","Microsoft.Windows.ParentalControls","Microsoft.Windows.OOBENetworkConnectionFlow","Microsoft.Windows.PeopleExperienceHost","Microsoft.CredDialogHost","Microsoft.WindowsAlarms","Microsoft.SkypeApp","Microsoft.WindowsSoundRecorder","Microsoft.WindowsMaps","Microsoft.WindowsCalculator","Microsoft.StorePurchaseApp","Microsoft.Office.OneNote","Microsoft.MSPaint","Microsoft.MicrosoftStickyNotes","Microsoft.Services.Store.Engagement","Microsoft.Services.Store.Engagement","Microsoft.DesktopAppInstaller","Microsoft.Advertising.Xaml","Microsoft.Advertising.Xaml","Microsoft.XboxGameCallableUI","1527c705-839a-4832-9118-54d4Bd6a0c89","c5e2524a-ea46-4f67-841f-6a9465d9d515","E2A4F912-2574-4A75-9BB0-0D023378592B","F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE","InputApp","Microsoft.ECApp","Microsoft.BioEnrollment"
 $packagesToSpareWildcard = "*Microsoft.NET*","*Microsoft.VCLibs*","*Microsoft.LanguageExperiencePack*"
 [System.Collections.ArrayList]$packagesToSpare = $packagesToSpareNamed
 $packagesToSpareWildcard | % {$packagesToSpare += (Get-AppxPackage $_).name}
 [System.Collections.ArrayList]$packages = @()
-Get-AppxPackage | % {if ($_.name -notin $packagesToSpare) {$packages += $_}}
+Get-AppxPackage | % {if ($_.name -notin $packagesToSpare) {$packages += $_.name}}
 
 [System.Collections.ArrayList]$stillinstalled = @()
 $i = 1
 foreach ($p in $packages) {
-    $job = Start-Job {param($p); Get-AppxPackage $p.name | Remove-AppxPackage } -ArgumentList $p
+    $job = Start-Job {param($p); Get-AppxPackage $p | Remove-AppxPackage } -ArgumentList $p
     Wait-Job $job | Out-Null
-    if (-not (Get-AppxPackage $p.name)) {
+    if (-not (Get-AppxPackage $p)) {
         Write-Progress -Activity "Deinstalliere App-Packete" -Status (([math]::Round($i/$packages.count*100)).toString()+"% Complete:") -PercentComplete ($i/$packages.count*100) -CurrentOperation "$p deinstalliert"
         $i++
     }
