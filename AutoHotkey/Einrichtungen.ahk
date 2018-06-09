@@ -82,6 +82,7 @@ F4:: Suspend
 ; Only run when Windows Explorer or Desktop is active
 ; Options:
 ; -s    to open the created file with sublime text regardless of its associated program
+; -c    to just create a file without interacting with it any further
 #IfWinActive ahk_class CabinetWClass
 ^!n::
 #IfWinActive ahk_class ExploreWClass
