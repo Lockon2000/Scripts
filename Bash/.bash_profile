@@ -14,6 +14,7 @@ white="\e[0;97m"
 reset="\e[0m"
 
 export GIT_PS1_SHOWDIRTYSTATE=1
+
 # reset the colors after my command
 trap 'echo -n -e "$reset"' DEBUG
 
