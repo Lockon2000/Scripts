@@ -8,9 +8,10 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; | ** Daily Hotkeys **                                                  |
 ; | F4: Hotkey to suspend the script                                     |
 ; | Alt+W: Pin the active window on top of any other window              |
-; | Ctrl+Alt+P: Hotkey to launch PowerShell in Admin mode                |
+; | Ctrl+Alt+P: Launch PowerShell in Admin mode                          |
+; | Ctrl+Alt+S: Launch Sublime Text                                      |
 ; | Ctrl+Alt+N: Create a new file and run it with the associated program |
-; | Ctrl+Alt+S: Open clipboard with Sublime Text                         |
+; | Ctrl+Shift+S: Open Clipboard with Sublime Text                       |
 ; |----------------------------------------------------------------------|
 ; | ** Debungging Hotkeys **                                             |
 ; | Ctrl+Alt+1                                                           |
@@ -22,11 +23,11 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 F4:: Suspend
 
 
-; Pin the active window on top of any other window
+; Alt+W: Pin the active window on top of any other window
 !w:: Winset, Alwaysontop, TOGGLE, A
 
 
-; Hotkey to launch PowerShell in Admin mode
+; Ctrl+Alt+P: Hotkey to launch PowerShell in Admin mode
 ; Only run when Windows Explorer or Desktop is active
 #IfWinActive ahk_class CabinetWClass
 ^!p::
@@ -78,7 +79,11 @@ F4:: Suspend
 #IfWinActive
 
 
-; Create a new file and run it with the associated program
+; Ctrl+Alt+S: Launch Sublime Text
+^!s:: Run, "C:\Program Files\Sublime Text 3\sublime_text.exe"
+
+
+; Ctrl+Alt+N: Create a new file and run it with the associated program
 ; Only run when Windows Explorer or Desktop is active
 ; Options:
 ; -s    to open the created file with sublime text regardless of its associated program
@@ -194,26 +199,32 @@ F4:: Suspend
 #IfWinActive
 
 
-; Ctrl+Alt+S: Open clipboard with Sublime Text
+; Ctrl+Shift+S: Open Clipboard with Sublime Text
+; The Clipboard is restored after the operation
 ; Only run when Windows Explorer or Desktop is active
 #IfWinActive ahk_class CabinetWClass
-^!s::
+^+s::
 #IfWinActive ahk_class ExploreWClass
-^!s::
+^+s::
 #IfWinActive ahk_class Progman
-^!s::
+^+s::
 #IfWinActive ahk_class WorkerW
-^!s::
-    clipboard =     ; Empty the clipboard
+^+s::
+    temp := Clipboard
+    Clipboard =     ; Empty the clipboard
     Send, ^c        ; Populate the clipboard with the focused files name
     ClipWait, 0.5   ; Wait up to 0.5 seconds for the clipboard to have content
     if ErrorLevel
     {
-        MsgBox, The attempt to copy text onto the clipboard failed.
+        MsgBox, The attempt to copy text onto the Clipboard failed.
+        Clipboard := temp
+        
         return
     }
-    clipboard := StrReplace(clipboard, "`r`n", A_space)     ; For the case of multiselection
-    Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %clipboard%
+    Clipboard := StrReplace(Clipboard, "`r`n", A_space)     ; For the case of multiselection
+    Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %Clipboard%
+    Clipboard := temp
+
     return
 
 #IfWinActive
@@ -234,16 +245,11 @@ F4:: Suspend
 
 
 ; ^!2::
-;     clipboard =     ; Empty the clipboard
-;     Send, ^c        ; Populate the clipboard with the focused files name
-;     ClipWait, 0.5   ; Wait up to 0.5 seconds for the clipboard to have content
-;     if ErrorLevel
-;     {
-;         MsgBox, The attempt to copy text onto the clipboard failed.
-;         return
-;     }
-;     clipboard := StrReplace(clipboard, "`r`n", A_space)
-;     MsgBox, %clipboard%
+;     temp = 24893
+
+;     Clipboard := temp
+
+;     ; MsgBox, %Clipboard%
 
 ;     return
 
