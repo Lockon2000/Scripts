@@ -3,7 +3,7 @@
 $CurrentlyAdmin = (New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 If (-Not $CurrentlyAdmin)
 {
-    Start-Process powershell.exe -Verb runAs -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File $PSCommandPath"
+    Start-Process powershell.exe -Verb runAs -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File `"$PSCommandPath`""
     Exit
 }
 # ---------------------------
@@ -82,7 +82,9 @@ $packagesToSpareNamed = @("Microsoft.RemoteDesktop"
                           "F46D4000-FD22-4DB4-AC8E-4E1DDDE828FE"
                           "InputApp"
                           "Microsoft.ECApp"
-                          "Microsoft.BioEnrollment")
+                          "Microsoft.BioEnrollment"
+                          "Windows.CBSPreview"
+                          "Microsoft.AsyncTextService")
 $packagesToSpareWildcard = @("*Microsoft.NET*"
                              "*Microsoft.VCLibs*"
                              "*Microsoft.LanguageExperiencePack*")
