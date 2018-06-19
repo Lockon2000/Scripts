@@ -10,12 +10,15 @@ If (-Not $CurrentlyAdmin)
 # Disable Microsoft Consumer Experience
 
 if (Test-Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\) {
-    Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\ -Name DisableWindowsConsumerFeatures -Value 1
+    if (-not (Get-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\).DisableWindowsConsumerFeatures) {
+        Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\ -Name DisableWindowsConsumerFeatures -Value 1
+        Write-Output "Microsoft Consumer Experience deaktiviert"
+    }
 } else {
     New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\ -Name CloudContent | Out-Null
     Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\ -Name DisableWindowsConsumerFeatures -Value 1
+    Write-Output "Microsoft Consumer Experience deaktiviert"
 }
-Write-Output "Microsoft Consumer Experience deaktiviert"
 # ---------------------------
 # Uninstall Apps
 
@@ -183,7 +186,14 @@ function Pin-App {
     }
 }
 
-$apps = (New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items()
+function ToArray
+{
+  begin {$output = @()}
+  process {$output += $_}
+  end {return ,$output}
+}
+
+$apps = (New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items() | ToArray
 $apps | % {pin-app $_.name -unpin} *>$null
 
 Write-Output "Alle Kacheln vom Startmenü entfernt"
