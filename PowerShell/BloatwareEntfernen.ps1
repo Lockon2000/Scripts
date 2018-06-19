@@ -12,7 +12,7 @@ If (-Not $CurrentlyAdmin)
 if (Test-Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\) {
     Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\ -Name DisableWindowsConsumerFeatures -Value 1
 } else {
-    New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\ -Name CloudContent
+    New-Item -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\ -Name CloudContent | Out-Null
     Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\ -Name DisableWindowsConsumerFeatures -Value 1
 }
 Write-Output "Microsoft Consumer Experience deaktiviert"
