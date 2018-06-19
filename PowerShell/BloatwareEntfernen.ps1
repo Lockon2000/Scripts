@@ -84,7 +84,9 @@ $packagesToSpareNamed = @("Microsoft.RemoteDesktop"
                           "Microsoft.ECApp"
                           "Microsoft.BioEnrollment"
                           "Windows.CBSPreview"
-                          "Microsoft.AsyncTextService")
+                          "Microsoft.AsyncTextService"
+                          "Microsoft.MicrosoftEdgeDevToolsClient"
+                          "Microsoft.Windows.CapturePicker")
 $packagesToSpareWildcard = @("*Microsoft.NET*"
                              "*Microsoft.VCLibs*"
                              "*Microsoft.LanguageExperiencePack*")
