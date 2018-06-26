@@ -9,6 +9,17 @@ function prompt {
     "PS> "
 }
 
+function elevate {
+    $CurrentlyAdmin = (New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+    if (-Not $CurrentlyAdmin)
+    {
+        Start-Process powershell.exe -Verb runAs
+        Exit
+    } else {
+        Write-Output "You have already Admin Privileges"
+    }
+}
+
 New-Alias -Name sublime -Value "C:\Program Files\Sublime Text 3\sublime_text.exe"
 New-Alias -Name m -Value more
 New-Alias -Name less -Value more
