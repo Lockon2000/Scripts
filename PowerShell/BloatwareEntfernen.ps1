@@ -1,3 +1,5 @@
+Write-Output "in Arbeit ...."
+
 # Check wether the session is elevated or not
 $CurrentlyAdmin = (New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 
@@ -65,19 +67,20 @@ if (-not $CurrentlyAdmin) {
     $packagesToSpareWildcard = @("*Microsoft.NET*"
                                  "*Microsoft.VCLibs*"
                                  "*Microsoft.LanguageExperiencePack*")
-    [System.Collections.ArrayList]$packagesToSpare = $packagesToSpareNamed
+    [System.Collections.ArrayList]$packagesToSpare = @()
+    $packagesToSpareNamed | % {$packagesToSpare += (Get-AppxPackage $_).name}
     $packagesToSpareWildcard | % {$packagesToSpare += (Get-AppxPackage $_).name}
     [System.Collections.ArrayList]$packages = @()
-    Get-AppxPackage -AllUsers | ? {$env:username -in $_.PackageUserInformation.UserSecurityId.Username} | % {if ($_.name -notin $packagesToSpare) {$packages += $_.name}}
+    Get-AppxPackage | % {if ($_.name -notin $packagesToSpare) {$packages += $_}}
 
     [System.Collections.ArrayList]$stillinstalled = @()
     $i = 1
     foreach ($p in $packages) {
-        $job = Start-Job {param($p); Get-AppxPackage $p | Remove-AppxPackage } -ArgumentList $p
+        $job = Start-Job {param($p); $p | Remove-AppxPackage} -ArgumentList $p
         Wait-Job $job | Out-Null
-        if (-not (Get-AppxPackage $p)) {
+        if (-not (Get-AppxPackage $p.name)) {
             Write-Progress -Activity "Deinstalliere App-Packete" -Status (([math]::Round($i/$packages.count*100)).toString()+"% Complete:") `
-                -PercentComplete ($i/$packages.count*100) -CurrentOperation "$p deinstalliert"
+                -PercentComplete ($i/$packages.count*100) -CurrentOperation "$($p.name) deinstalliert"
             $i++
         }
         else {
@@ -86,7 +89,7 @@ if (-not $CurrentlyAdmin) {
     }
 
     if ($stillinstalled) {
-        Write-Output "Folgende Apps wurden nicht deinstalliert: " $stillinstalled
+        Write-Output "Folgende Apps wurden nicht deinstalliert: " $stillinstalled.name
     }
 
     Write-Output "Deinstallation von Apps fertig"
@@ -156,30 +159,34 @@ if ($CurrentlyAdmin) {
 
     # Remove Provisions
 
-    $provisions = @("*Microsoft.BingWeather*"
-                    "*Microsoft.Messaging*"
-                    "*Microsoft.Microsoft3DViewer*"
-                    "*Microsoft.MicrosoftSolitaireCollection*"
-                    "*Microsoft.Office.OneNote*"
-                    "*Microsoft.Print3D*"
-                    "*Microsoft.MSPaint*"
-                    "*Microsoft.Wallet*"
-                    "*Microsoft.WindowsFeedbackHub*"
-                    "*Microsoft.Xbox.TCUI*"
-                    "*Microsoft.XboxApp*"
-                    "*Microsoft.XboxGameOverlay*"
-                    "*Microsoft.XboxIdentityProvider*"
-                    "*Microsoft.XboxSpeechToTextOverlay*"
-                    "*Microsoft.ZuneMusic*"
-                    "*Microsoft.ZuneVideo*")
+    $provisionsToWipe = @("*Microsoft.BingWeather*"
+                          "*Microsoft.Messaging*"
+                          "*Microsoft.Microsoft3DViewer*"
+                          "*Microsoft.MicrosoftSolitaireCollection*"
+                          "*Microsoft.Office.OneNote*"
+                          "*Microsoft.Print3D*"
+                          "*Microsoft.MSPaint*"
+                          "*Microsoft.Wallet*"
+                          "*Microsoft.WindowsFeedbackHub*"
+                          "*Microsoft.Xbox.TCUI*"
+                          "*Microsoft.XboxApp*"
+                          "*Microsoft.XboxGameOverlay*"
+                          "*Microsoft.XboxIdentityProvider*"
+                          "*Microsoft.XboxSpeechToTextOverlay*"
+                          "*Microsoft.ZuneMusic*"
+                          "*Microsoft.ZuneVideo*")
+    [System.Collections.ArrayList]$provisions = @()
+    foreach ($p in $provisionsToWipe) {
+        Get-AppxProvisionedPackage -Online | % {if ($_.packagename -like $p) {$provisions += $_}}
+    }
 
     $i = 1
     [System.Collections.ArrayList]$stillinstalled = @()
     foreach ($p in $provisions) {
-        Get-AppxProvisionedPackage –online | where-object {$_.packagename –like $p} | remove-AppxProvisionedPackage –online *>$null
-        if (-not (Get-AppxProvisionedPackage –online | where-object {$_.packagename –like $p})) {
+        $p | remove-AppxProvisionedPackage -online *>$null
+        if (-not (Get-AppxProvisionedPackage -online | ? {$_.packagename -like $p.packagename})) {
             Write-Progress -Activity "Deinstalliere App-Provisionen" -Status (([math]::Round($i/$provisions.count*100)).toString()+"% Complete:") `
-                -PercentComplete ($i/$provisions.count*100) -CurrentOperation "$p gelöscht"
+                -PercentComplete ($i/$provisions.count*100) -CurrentOperation "$($p.packagename) gelöscht"
             $i++
         }
         else {
@@ -188,7 +195,7 @@ if ($CurrentlyAdmin) {
     }
 
     if ($stillinstalled) {
-        Write-Output "Folgende Provisionen wurden nicht entfernt: " $stillinstalled
+        Write-Output "Folgende Provisionen wurden nicht entfernt: " $stillinstalled.packagename
     }
 
     Write-Output "Deinstallation von App-Provisionen fertig"
