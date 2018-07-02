@@ -214,6 +214,7 @@ F4:: Suspend
     Clipboard =     ; Empty the clipboard
     Send, ^c        ; Populate the clipboard with the focused files name
     ClipWait, 0.5   ; Wait up to 0.5 seconds for the clipboard to have content
+
     if ErrorLevel
     {
         MsgBox, The attempt to copy text onto the Clipboard failed.
@@ -221,8 +222,17 @@ F4:: Suspend
         
         return
     }
-    Clipboard := StrReplace(Clipboard, "`r`n", A_space)     ; For the case of multiselection
-    Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %Clipboard%
+
+    StringSplit, files, Clipboard, `n
+    argumet =
+    Loop, %files0%
+    {
+        argument := argument """" files%a_index% """" A_Space
+    }
+    argument := StrReplace(argument, "`r", "")
+
+    Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %argument%
+
     Clipboard := temp
 
     return
@@ -235,21 +245,12 @@ F4:: Suspend
 ; Tools for developing
 ; Only uncomment when needed
 
-; ^!1::
-;     clipboard = 
-;     Send, ^c
-;     ClipWait ;waits for the clipboard to have content
-;     Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %clipboard%
+; ^!r::Reload  ; Assign Ctrl-Alt-R as a hotkey to restart the script.
 
-;     return
+; ^!1::
 
 
 ; ^!2::
-;     temp = 24893
 
-;     Clipboard := temp
 
-;     ; MsgBox, %Clipboard%
-
-;     return
-
+; ^!3::
