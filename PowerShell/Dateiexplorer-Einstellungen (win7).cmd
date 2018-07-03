@@ -1,0 +1,1 @@
+Powershell.exe -NoLogo -ExecutionPolicy Bypass -File "Dateiexplorer-Einstellungen.ps1"
