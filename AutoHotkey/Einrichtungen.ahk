@@ -223,8 +223,8 @@ F4:: Suspend
         return
     }
 
+    argument =       ; Epmty argument so it doesn't accumulate names over multiple uses
     StringSplit, files, Clipboard, `n
-    argumet =
     Loop, %files0%
     {
         argument := argument """" files%a_index% """" A_Space
