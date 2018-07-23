@@ -28,7 +28,7 @@ F4:: Suspend
 
 
 ; Ctrl+Alt+P: Hotkey to launch PowerShell in Admin mode
-; Only run when Windows Explorer or Desktop is active
+; If an Explorer Window is active
 #IfWinActive ahk_class CabinetWClass
 ^!p::
 #IfWinActive ahk_class ExploreWClass
@@ -67,6 +67,7 @@ F4:: Suspend
 
     Return
 
+; If the Desktop is active
 #IfWinActive ahk_class Progman
 ^!p::
 #IfWinActive ahk_class WorkerW
@@ -76,7 +77,13 @@ F4:: Suspend
 
     Return
 
+; If anything else is active and also turn off context sensitivity
 #IfWinActive
+^!p::
+    ; Open the file in the appropriate editor
+    Run *RunAs C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe
+
+    Return
 
 
 ; Ctrl+Alt+S: Launch Sublime Text
