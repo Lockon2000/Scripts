@@ -6,8 +6,39 @@ $CurrentlyAdmin = (New-Object Security.Principal.WindowsPrincipal $([Security.Pr
 # Things to do without privileges (uninstall apps, unping apps from start menu)
 
 if (-not $CurrentlyAdmin) {
-    # Uninstall Apps
+    # Remove pinned apps from Start menu
+    function Pin-App {
+        param(
+            [parameter(mandatory=$true)][ValidateNotNullOrEmpty()][string[]]$appname,
+            [switch]$unpin
+        )
+        $actionstring = @{$true='Von "Start" lösen|Unpin from Start';$false='An "Start" anheften|Pin to Start'}[$unpin.IsPresent]
+        $action = @{$true='unpinned from';$false='pinned to'}[$unpin.IsPresent]
+        $apps = (New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items() | ?{$_.Name -in $appname}
+        
+        if($apps){
+            $notfound = compare $appname $apps.Name -PassThru
+            if ($notfound){write-error "These App(s) were not found: $($notfound -join ",")"}
 
+            foreach ($app in $apps){
+                $appaction = $app.Verbs() | ?{$_.Name.replace('&','') -match $actionstring}
+                if ($appaction){
+                    $appaction | %{$_.DoIt(); return "App '$($app.Name)' $action Start"}
+                }else{
+                    write-error "App '$($app.Name)' is already pinned to start or action not supported."
+                }
+            }
+        }else{
+            write-error "App(s) not found: $($appname -join ",")"
+        }
+    }
+
+    $apps = (New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items()
+    $apps | % {pin-app $_.name -unpin} *>$null
+
+    Write-Output "Alle Kacheln vom Startmenü entfernt"
+
+    # Uninstall apps
     $packagesToSpareNamed = @("Microsoft.RemoteDesktop"
                               "Microsoft.WebMediaExtensions"
                               "Microsoft.Win32WebViewHost"
@@ -93,45 +124,10 @@ if (-not $CurrentlyAdmin) {
     }
 
     Write-Output "Deinstallation von Apps fertig"
-
-
-    # Remove pinned apps from Start menu
-
-    function Pin-App {
-        param(
-            [parameter(mandatory=$true)][ValidateNotNullOrEmpty()][string[]]$appname,
-            [switch]$unpin
-        )
-        $actionstring = @{$true='Von "Start" lösen|Unpin from Start';$false='An "Start" anheften|Pin to Start'}[$unpin.IsPresent]
-        $action = @{$true='unpinned from';$false='pinned to'}[$unpin.IsPresent]
-        $apps = (New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items() | ?{$_.Name -in $appname}
-        
-        if($apps){
-            $notfound = compare $appname $apps.Name -PassThru
-            if ($notfound){write-error "These App(s) were not found: $($notfound -join ",")"}
-
-            foreach ($app in $apps){
-                $appaction = $app.Verbs() | ?{$_.Name.replace('&','') -match $actionstring}
-                if ($appaction){
-                    $appaction | %{$_.DoIt(); return "App '$($app.Name)' $action Start"}
-                }else{
-                    write-error "App '$($app.Name)' is already pinned to start or action not supported."
-                }
-            }
-        }else{
-            write-error "App(s) not found: $($appname -join ",")"
-        }
-    }
-
-    $apps = (New-Object -Com Shell.Application).NameSpace('shell:::{4234d49b-0245-4df3-b780-3893943456e1}').Items()
-    $apps | % {pin-app $_.name -unpin} *>$null
-
-    Write-Output "Alle Kacheln vom Startmenü entfernt"
 }
 
 
 # Elevate the Session if not already elevated
-
 If (-Not $CurrentlyAdmin)
 {
     Start-Process powershell.exe -Verb runAs -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File `"$PSCommandPath`""
@@ -139,10 +135,8 @@ If (-Not $CurrentlyAdmin)
 
 
 # Things to do with admin privileges (disable Microsoft Consumer Experiance, remove app provisions)
-
 if ($CurrentlyAdmin) {
     # Disable Microsoft Consumer Experience
-
     if (Test-Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\) {
         if (-not (Get-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\).DisableWindowsConsumerFeatures) {
             Set-ItemProperty -Path HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent\ -Name DisableWindowsConsumerFeatures -Value 1
@@ -158,7 +152,6 @@ if ($CurrentlyAdmin) {
 
 
     # Remove Provisions
-
     $provisionsToWipe = @("*Microsoft.BingWeather*"
                           "*Microsoft.Messaging*"
                           "*Microsoft.Microsoft3DViewer*"
