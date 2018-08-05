@@ -8,6 +8,7 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; | ** Daily Hotkeys **                                                  |
 ; | F4: Hotkey to suspend the script                                     |
 ; | Alt+W: Pin the active window on top of any other window              |
+; | Ctrl+Alt+C: Add to the Clipboard                                     |
 ; | Ctrl+Alt+P: Launch PowerShell in Admin mode                          |
 ; | Ctrl+Alt+S: Launch Sublime Text                                      |
 ; | Ctrl+Alt+N: Create a new file and run it with the associated program |
@@ -25,6 +26,26 @@ F4:: Suspend
 
 ; Alt+W: Pin the active window on top of any other window
 !w:: Winset, Alwaysontop, TOGGLE, A
+
+
+; Ctrl+Alt+C: Add to the Clipboard
+^!c::
+    previousClipboard := Clipboard
+    Clipboard =
+    Send, ^c
+    ClipWait, 0.5
+
+    if ErrorLevel
+    {
+        MsgBox, The attempt to copy text onto the Clipboard failed.
+        Clipboard := previousClipboard
+        
+        return
+    }
+
+    Clipboard := previousClipboard "`r`n" Clipboard
+
+    return
 
 
 ; Ctrl+Alt+P: Hotkey to launch PowerShell in Admin mode
@@ -231,12 +252,11 @@ F4:: Suspend
     }
 
     argument =       ; Epmty argument so it doesn't accumulate names over multiple uses
-    StringSplit, files, Clipboard, `n
-    Loop, %files0%
+    files := StrSplit(Clipboard, "`r`n")
+    for index, element in files
     {
-        argument := argument """" files%a_index% """" A_Space
+        argument := argument """" element """" A_Space
     }
-    argument := StrReplace(argument, "`r", "")
 
     Run, "C:\Program Files\Sublime Text 3\sublime_text.exe" %argument%
 
@@ -245,7 +265,6 @@ F4:: Suspend
     return
 
 #IfWinActive
-
 
 
 ;------------------------------------------------------------------
