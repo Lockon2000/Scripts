@@ -10,11 +10,16 @@ function ToArray {
 
 
 function Elevate-PSSession {
+    param([switch]$Preserve)
+
     $CurrentlyAdmin = (New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+    
     if (-Not $CurrentlyAdmin)
     {
         Start-Process powershell.exe -Verb runAs
-        Exit
+        if (-not $Preserve) {
+            Exit
+        }
     } else {
         Write-Output "You have already Admin Privileges"
     }

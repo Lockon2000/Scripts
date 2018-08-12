@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)] [string]$commitMessage, [Parameter(Mandatory=$true)] [bool]$private)
+param([Parameter(Mandatory=$true)] [string]$commitMessage, [switch]$private)
 
 
 Copy-Item -Path "C:\Users\mabdelwahab\Arbeit\PowerShell-Skripte\*" -Destination "C:\Users\mabdelwahab\Arbeit\Scripts\PowerShell" -Exclude "*.md"
