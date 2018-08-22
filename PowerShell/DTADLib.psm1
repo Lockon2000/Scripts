@@ -6,7 +6,7 @@ function Get-Clients {
     [System.Collections.ArrayList]$list = @()
 
     if ("all" -in $Department) {
-        foreach ($file in (dir 'C:\Users\mabdelwahab\Arbeit\Administration\PowerShell Clients')) {
+        foreach ($file in (dir '\\odin\it\admin\Skripte\PowerShell Clients')) {
             $dep = $file.name.Substring(7,$file.name.Length-11)
             if ($dep -notin $Exclude) {
                 foreach ($pc in (Get-Content $file.FullName)) {
@@ -26,7 +26,7 @@ function Get-Clients {
         }
     } else {
         foreach ($dep in $Department) {
-            foreach ($pc in (Get-Content "C:\Users\mabdelwahab\Arbeit\Administration\PowerShell Clients\Clients$dep.txt")) {
+            foreach ($pc in (Get-Content "\\odin\it\admin\Skripte\PowerShell Clients\Clients$dep.txt")) {
                 $pc = $pc -split " "
 
                 if ($pc[0] -notin $Exclude) {
