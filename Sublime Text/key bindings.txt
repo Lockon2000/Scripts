@@ -11,6 +11,8 @@ Here I list all correspondences I have found out till now:
 Ctrl + `  -->  Ctrl + Ö
 Ctrl + ;  -->  Ctrl + Ü
 Ctrl + /  -->  Ctrl + #
+Ctrl + ]  -->  Ctrl + ´
+Ctrl + [  -->  Ctrl + ß
 
 _______________________________________________________________________________
 
