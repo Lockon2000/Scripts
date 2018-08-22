@@ -9,3 +9,7 @@ If (-Not $CurrentlyAdmin)
     Start-Process powershell.exe -Verb runAs -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File `"$PSCommandPath`""
     Exit
 }
+
+# To change a service startup type: 0 for instantly and 1 for delayed
+
+Set-ItemProperty -Path "Registry::HKLM\System\CurrentControlSet\Services\theservice" -Name "DelayedAutostart" -Value 1 -Type DWORD
