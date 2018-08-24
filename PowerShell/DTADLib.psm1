@@ -81,19 +81,19 @@ function Invoke-ClientCommand {
             Write-Host "Du hast keine Session (sess) definiert!"
             $ncsnArgs = @{}
 
-            $temp = Read-Host "Welche Abteilungen? (Standard `"all`"):" 
+            $temp = Read-Host "Welche Abteilungen? (Gib eine Komma-separierte List an! - Standard `"all`"):" 
             if ($temp.Length -ne 0) {
-                $ncsnArgs.Department = $temp                
+                $ncsnArgs.Department = $temp -split ","
             }
 
             $temp = Read-Host "Desktops oder Laptops? (Standard `"all`"):" 
             if ($temp.Length -ne 0) {
-                $ncsnArgs.PCType = $temp                
+                $ncsnArgs.PCType = $temp
             }
 
-            $temp = Read-Host "Möchtest du was Ausschließen? (Standard None):"
-            if ($temp.Length -eq 0) {
-                $ncsnArgs.Exclude = $temp
+            $temp = Read-Host "Möchtest du was Ausschließen? (Gib eine Komma-separierte List an! - Standard `"None`"):"
+            if ($temp.Length -ne 0) {
+                $ncsnArgs.Exclude = $temp -split ","
             }
 
             $global:sess = New-ClientSession @ncsnArgs
@@ -107,7 +107,7 @@ function Invoke-StructuredClientCommand {
     if ($args.Length -eq 0) {
         Write-Host "Gib einen Ausdruck ein!!"
     } else {
-        Invoke-ClientCommand $args | Sort -Property PSComputerName | Format-Table -GroupBy PSComputerName
+        Invoke-ClientCommand ([string]$args) | Sort -Property PSComputerName | Format-Table -GroupBy PSComputerName
     }
 }
 
