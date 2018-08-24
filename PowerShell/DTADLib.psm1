@@ -54,9 +54,16 @@ function New-ClientSession {
     }
 }
 
+function New-NamedClientSession {
+    param([string[]]$Department="all", [string]$PCType="all", [string[]]$Exclude)
+
+    $global:sess = New-ClientSession -Department $Department -PCType $PCType -Exclude $Exclude
+    Write-Host "Eine neue Remote Session wurde hergestellt und in der Variable `"sess`" gespeichert."
+}
+
 function Invoke-ClientCommand {
     if ($args.Length -eq 0) {
-        Write-Host "Gib ein Cmdlet ein!!"
+        Write-Host "Gib einen Ausdruck ein!!"
     } else {
         if (Test-Path Variable:global:sess) {
             $cmd = [ScriptBlock]::Create($args)
@@ -87,10 +94,20 @@ function Invoke-ClientCommand {
     }
 }
 
+function Invoke-StructuredClientCommand {
+    if ($args.Length -eq 0) {
+        Write-Host "Gib einen Ausdruck ein!!"
+    } else {
+        Invoke-ClientCommand $args | Sort -Property PSComputerName | Format-Table -GroupBy PSComputerName
+    }
+}
+
 
 New-Alias gcli -Value Get-Clients
 New-Alias ncsn -Value New-ClientSession
+New-Alias nncsn -Value New-NamedClientSession
 New-Alias iccm -Value Invoke-ClientCommand
+New-Alias isccm -Value Invoke-StructuredClientCommand
 
 
 Export-ModuleMember -Variable * -Function * -Alias *
