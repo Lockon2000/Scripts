@@ -49,8 +49,17 @@ function New-ClientSession {
     param([string[]]$Department="all", [string]$PCType="all", [string[]]$Exclude)
 
     if ($PCType -eq "all") {
-        return (New-PSSession -ComputerName (Get-Clients -Department $Department -PCType "d" -Exclude $Exclude) -Credential $cred.admin.desktop) +
-               (New-PSSession -ComputerName (Get-Clients -Department $Department -PCType "l" -Exclude $Exclude) -Credential $cred.admin.laptop)
+        $Desktops = Get-Clients -Department $Department -PCType "d" -Exclude $Exclude
+        $Laptops = Get-Clients -Department $Department -PCType "l" -Exclude $Exclude
+
+        if (($Desktops.Length -ne 0) -and ($Laptops.Length -ne 0)) {
+            return (New-PSSession -ComputerName $Desktops -Credential $cred.admin.desktop) + (New-PSSession -ComputerName $Laptops -Credential $cred.admin.laptop)
+        } elseif ($Desktops.Length -ne 0) {
+            return (New-PSSession -ComputerName $Desktops -Credential $cred.admin.desktop)
+        } else {
+            return (New-PSSession -ComputerName $Laptops -Credential $cred.admin.laptop)
+        }
+
     }
 }
 
