@@ -1,23 +1,39 @@
-$cred = Import-Clixml -Path C:\Users\mabdelwahab\Arbeit\Administration\cred.xml
+$Cred = Import-Clixml -Path C:\Users\mabdelwahab\Arbeit\Administration\cred.xml
+$CredAdminDesktop = $Cred.Admin.Desktop
+$CredAdminLaptop = $Cred.Admin.Laptop
+$CredUser = $Cred.User
+$CredMAbdelwahab = $Cred.MAbdelwahab
+$Departments = (Dir "\\odin\it\admin\Skripte\PowerShell Clients" | Foreach-Object {($_.name[7..($_.name.Length-5)] -join "").ToLower()})
+
+Remove-Variable Cred
 
 
-function Get-Clients {
-    param([string[]]$Department="all", [string]$PCType="all", [string[]]$Exclude)
-    [System.Collections.ArrayList]$list = @()
+function Get-Client {
+    param([string[]]$Include="all", [string]$PCType="all", [string[]]$Exclude, [switch]$ReturnPCObj)
+    [System.Collections.ArrayList]$List = @()
 
-    if ("all" -in $Department) {
-        foreach ($file in (dir '\\odin\it\admin\Skripte\PowerShell Clients')) {
-            $dep = $file.name[7..($file.name.Length-5)] -join ""
-            if ($dep -notin $Exclude) {
-                foreach ($pc in (Get-Content $file.FullName)) {
-                    $pc = $pc -split " "
+    if ("all" -in $Include) {
+        foreach ($File in (Dir '\\odin\it\admin\Skripte\PowerShell Clients')) {
+            $Department = $File.Name[7..($File.Name.Length-5)] -join ""
+            if ($Department -notin $Exclude) {
+                foreach ($Line in (Get-Content $File.Fullname)) {
+                    $Line = $Line.split("|")
+                    $PC = @{Name=$Line[0]; MAC=$Line[1]; Type=$Line[2]}
 
-                    if ($pc[0] -notin $Exclude) {
+                    if ($PC.Name -notin $Exclude) {
                         if ($PCType -eq "all") {
-                            $list += $pc[0]
+                            if ($ReturnPCObj) {
+                                [void]$List.Add($PC)
+                            } else {
+                                [void]$List.Add($PC.Name)
+                            }
                         } else {
-                            if ($pc[1] -eq $PCType) {
-                                $list += $pc[0]
+                            if ($PC.Type -eq $PCType) {
+                                if ($ReturnPCObj) {
+                                    [void]$List.Add($PC)
+                                } else {
+                                    [void]$List.Add($PC.Name)
+                                }
                             }
                         }
                     }
@@ -25,16 +41,52 @@ function Get-Clients {
             }
         }
     } else {
-        foreach ($dep in $Department) {
-            foreach ($pc in (Get-Content "\\odin\it\admin\Skripte\PowerShell Clients\Clients$dep.txt")) {
-                $pc = $pc -split " "
+        foreach ($DepartmentOrPC in $Include) {
+            if ($DepartmentOrPC -in $Departments) {
+                if ($DepartmentOrPC -notin $Exclude) {
+                    foreach ($Line in (Get-Content "\\odin\it\admin\Skripte\PowerShell Clients\Clients$DepartmentOrPC.txt")) {
+                        $Line = $Line.split("|")
+                        $PC = @{Name=$Line[0]; MAC=$Line[1]; Type=$Line[2]}
 
-                if ($pc[0] -notin $Exclude) {
-                    if ($PCType -eq "all") {
-                        $list += $pc[0]
-                    } else {
-                        if ($pc[1] -eq $PCType) {
-                            $list += $pc[0]
+                        if ($PC.Name -notin $Exclude) {
+                            if ($PCType -eq "all") {
+                                if ($ReturnPCObj) {
+                                    [void]$List.Add($PC)
+                                } else {
+                                    [void]$List.Add($PC.Name)
+                                }
+                            } else {
+                                if ($PC.Type -eq $PCType) {
+                                    if ($ReturnPCObj) {
+                                        [void]$List.Add($PC)
+                                    } else {
+                                        [void]$List.Add($PC.Name)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                if ($DepartmentOrPC -notin $Exclude) {
+                    foreach ($PC in (Get-Client -ReturnPCObj)) {
+                        if ($PC.Name -eq $DepartmentOrPC) {
+                            if ($PCType -eq "all") {
+                                if ($ReturnPCObj) {
+                                    [void]$List.Add($PC)
+                                } else {
+                                    [void]$List.Add($PC.Name)
+                                }
+                            } else {
+                                if ($PC.Type -eq $PCType) {
+                                    if ($ReturnPCObj) {
+                                        [void]$List.Add($PC)
+                                    } else {
+                                        [void]$List.Add($PC.Name)
+                                    }
+                                }
+                            }
+                            break
                         }
                     }
                 }
@@ -42,31 +94,42 @@ function Get-Clients {
         }
     }
 
-    return $list
+    return $List
+}
+
+function Enter-ClientSession {
+    param([Parameter(Mandatory=$true)] [string]$PCName)
+
+    $PC = Get-Client $PCName -ReturnPCObj
+    if ($PC.Type -eq "d") {
+        Enter-PSSession $PC.Name -Credential $CredAdminDesktop
+    } else {
+        Enter-PSSession $PC.Name -Credential $CredAdminLaptop
+    }
 }
 
 function New-ClientSession {
-    param([string[]]$Department="all", [string]$PCType="all", [string[]]$Exclude)
+    param([string[]]$Include="all", [string]$PCType="all", [string[]]$Exclude)
 
     if ($PCType -eq "all") {
-        $Desktops = Get-Clients -Department $Department -PCType "d" -Exclude $Exclude
-        $Laptops = Get-Clients -Department $Department -PCType "l" -Exclude $Exclude
+        $Desktops = Get-Client -Include $Include -PCType "d" -Exclude $Exclude
+        $Laptops = Get-Client -Include $Include -PCType "l" -Exclude $Exclude
 
         if (($Desktops.Length -ne 0) -and ($Laptops.Length -ne 0)) {
-            return (New-PSSession -ComputerName $Desktops -Credential $cred.admin.desktop) + (New-PSSession -ComputerName $Laptops -Credential $cred.admin.laptop)
+            return (New-PSSession -ComputerName $Desktops -Credential $CredAdminDesktop) + (New-PSSession -ComputerName $Laptops -Credential $CredAdminLaptop)
         } elseif ($Desktops.Length -ne 0) {
-            return (New-PSSession -ComputerName $Desktops -Credential $cred.admin.desktop)
+            return (New-PSSession -ComputerName $Desktops -Credential $CredAdminDesktop)
         } else {
-            return (New-PSSession -ComputerName $Laptops -Credential $cred.admin.laptop)
+            return (New-PSSession -ComputerName $Laptops -Credential $CredAdminLaptop)
         }
 
     }
 }
 
 function New-NamedClientSession {
-    param([string[]]$Department="all", [string]$PCType="all", [string[]]$Exclude)
+    param([string[]]$Include="all", [string]$PCType="all", [string[]]$Exclude)
 
-    $global:sess = New-ClientSession -Department $Department -PCType $PCType -Exclude $Exclude
+    $global:sess = New-ClientSession -Include $Include -PCType $PCType -Exclude $Exclude
     Write-Host "Eine neue Remote Session wurde hergestellt und in der Variable `"sess`" gespeichert."
 }
 
@@ -83,7 +146,7 @@ function Invoke-ClientCommand {
 
             $temp = Read-Host "Welche Abteilungen? (Gib eine Komma-separierte List an! - Standard `"all`"):" 
             if ($temp.Length -ne 0) {
-                $ncsnArgs.Department = $temp -split ","
+                $ncsnArgs.Include = $temp -split ","
             }
 
             $temp = Read-Host "Desktops oder Laptops? (Standard `"all`"):" 
@@ -112,7 +175,8 @@ function Invoke-StructuredClientCommand {
 }
 
 
-New-Alias gcli -Value Get-Clients
+New-Alias gcli -Value Get-Client
+New-Alias etcsn -Value Enter-ClientSession
 New-Alias ncsn -Value New-ClientSession
 New-Alias nncsn -Value New-NamedClientSession
 New-Alias iccm -Value Invoke-ClientCommand
