@@ -1,4 +1,23 @@
-param([Parameter(Mandatory=$true)] [string]$CommitMessage, [switch]$Private, [switch]$NoUSB, [switch]$NoDeployToProfile, [switch]$NoCommit, [switch]$NoPush)
+param([switch]$Private, [switch]$NoUSB,
+      [switch]$NoDeployToProfile,
+      [string]$CommitMessage, [switch]$NoCommit, [switch]$NoPush,
+      [switch]$Help)
+
+if ($Help) {
+    Write-Host "Hilfe zum Rollout-Skript:`n"
+    Write-Host "Private: Dateien werden nur nach `"Scripts`" kopiert."
+    Write-Host "NoUSB: Dateien werden nicht zum Tools-USB kopiert. (Private darf nicht angegeben sein)"
+    Write-Host "-------"
+    Write-Host "NoDeployToProfile: Die Änderungen werden nicht zum aktuellen Profil augerollt."
+    Write-Host "-------"
+    Write-Host "CommitMessage: Die Nachricht für den Commit."
+    Write-Host "NoCommit: Keine Interaktion mit der Repository wird durchgeführt."
+    Write-Host "NoPush: Die Commits werden nicht zu Origin gepusht."
+    Write-Host "-------"
+    Write-Host "Help: Drucke Hilfe aus."
+
+    return
+}
 
 
 Write-Output "-------------------------------------------------"
@@ -8,7 +27,7 @@ Copy-Item -Path "C:\Users\mabdelwahab\Arbeit\PowerShell-Skripte\*" -Destination 
 if (-not $Private) {
     Copy-Item -Path "C:\Users\mabdelwahab\Arbeit\PowerShell-Skripte\*" -Destination "\\odin\it\admin\Skripte" -Exclude "README.md","Microsoft.PowerShell_profile.ps1","Rollout.ps1" -PassThru
     if (-not $NoUSB) {
-        Copy-Item -Path "C:\Users\mabdelwahab\Arbeit\PowerShell-Skripte\*" -Destination "E:\Skripte" -Exclude "README.md","Microsoft.PowerShell_profile.ps1","Rollout.ps1" -PassThru
+        Copy-Item -Path "C:\Users\mabdelwahab\Arbeit\PowerShell-Skripte\*" -Destination "D:\Skripte" -Exclude "README.md","Microsoft.PowerShell_profile.ps1","Rollout.ps1","*.psm1" -PassThru
     }
 }
 

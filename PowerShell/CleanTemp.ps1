@@ -1,7 +1,7 @@
 $CurrentlyAdmin = (New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 If (-Not $CurrentlyAdmin)
 {
-    Start-Process powershell.exe -Verb runAs -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File $PSCommandPath"
+    Start-Process powershell.exe -Verb runAs -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File `"$PSCommandPath`""
     Exit
 }
 
@@ -41,5 +41,5 @@ ForEach ($drive in $drives) {
     $total2 = $total2 + $drive.FreeSpace
 }
 
-Write-Host Der freigegebene Speicherplatz betr√§gt (($total2 - $total1)/(1024*1024)) MBs `n
+Write-Host Der freigegebene Speicherplatz betr‰gt (($total2 - $total1)/(1024*1024)) MBs `n
 Pause
