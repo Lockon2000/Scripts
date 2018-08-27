@@ -1,4 +1,23 @@
-param([Parameter(Mandatory=$true)] [string]$CommitMessage, [switch]$Private, [switch]$NoUSB, [switch]$NoDeployToProfile, [switch]$NoCommit, [switch]$NoPush)
+param([switch]$Private, [switch]$NoUSB,
+      [switch]$NoDeployToProfile,
+      [string]$CommitMessage, [switch]$NoCommit, [switch]$NoPush,
+      [switch]$Help)
+
+if ($Help) {
+    Write-Host "Hilfe zum Rollout-Skript:`n"
+               "Private: Dateien werden nur nach `"Scripts`" kopiert."
+               "NoUSB: Dateien werden nicht zum Tools-USB kopiert. (Private darf nicht angegeben sein)"
+               "-------"
+               "NoDeployToProfile: Die Änderungen werden nicht zum aktuellen Profil augerollt."
+               "-------"
+               "CommitMessage: Die Nachricht für den Commit."
+               "NoCommit: Keine Interaktion mit der Repository wird durchgeführt."
+               "NoPush: Die Commits werden nicht zu Origin gepusht."
+               "-------"
+               "Help: Drucke Hilfe aus."
+
+    return
+}
 
 
 Write-Output "-------------------------------------------------"

@@ -134,12 +134,18 @@ function New-NamedClientSession {
 }
 
 function Invoke-ClientCommand {
-    if ($args.Length -eq 0) {
+    param([Parameter(Position=0,ValueFromRemainingArguments=$true)] [string]$CmdString, [string[]]$Include)
+    if ($CmdString.Length -eq 0) {
         Write-Host "Gib einen Ausdruck ein!!"
     } else {
         if (Test-Path Variable:global:sess) {
-            $cmd = [ScriptBlock]::Create($args)
-            Invoke-Command -Session $sess -ScriptBlock $cmd
+            $Cmd = [ScriptBlock]::Create($CmdString)
+            if ($Include.Length -ne 0) {
+                $NarrowedSession = Get-PSSession | Where ComputerName -in $Include
+                Invoke-Command -Session $NarrowedSession -ScriptBlock $Cmd
+            } else {
+                Invoke-Command -Session $sess -ScriptBlock $Cmd
+            }
         } else {
             Write-Host "Du hast keine Session (sess) definiert!"
             $ncsnArgs = @{}
@@ -158,19 +164,42 @@ function Invoke-ClientCommand {
             if ($temp.Length -ne 0) {
                 $ncsnArgs.Exclude = $temp -split ","
             }
-
             $global:sess = New-ClientSession @ncsnArgs
-            $cmd = [ScriptBlock]::Create($args)
-            Invoke-Command -Session $sess -ScriptBlock $cmd
+
+            $Cmd = [ScriptBlock]::Create($CmdString)
+            if ($Include.Length -ne 0) {
+                foreach ($PC in $Include) {
+                    $PCSession = Get-PSSession | Where ComputerName -eq $PC
+                    Invoke-Command -Session $PCSession -ScriptBlock $Cmd
+                }
+            } else {
+                Invoke-Command -Session $sess -ScriptBlock $Cmd
+            }
         }
     }
 }
 
 function Invoke-StructuredClientCommand {
-    if ($args.Length -eq 0) {
+    param([Parameter(Position=0,ValueFromRemainingArguments=$true)] [string]$CmdString, [string[]]$Include)
+    if ($CmdString.Length -eq 0) {
         Write-Host "Gib einen Ausdruck ein!!"
     } else {
-        Invoke-ClientCommand ([string]$args) | Sort -Property PSComputerName | Format-Table -GroupBy PSComputerName
+        if ($Include.Length -ne 0) {
+            $Outputs = Invoke-ClientCommand -Include $Include $CmdString | Group-Object -Property PSComputerName
+            foreach ($Output in $Outputs) {
+                $PCName = $Output.Name
+                Write-Output "`nErgebnisse von PC: $PCName"
+                $Output | Select -ExpandProperty Group
+            }
+        } else {
+            $Outputs = Invoke-ClientCommand $CmdString | Group-Object -Property PSComputerName
+            foreach ($Output in $Outputs) {
+                $PCName = $Output.Name
+                Write-Output "`nErgebnisse von PC: $PCName"
+                $Output | Select -ExpandProperty Group | Out-Default
+            
+            }
+        }
     }
 }
 
