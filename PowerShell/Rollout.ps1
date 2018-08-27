@@ -5,16 +5,16 @@ param([switch]$Private, [switch]$NoUSB,
 
 if ($Help) {
     Write-Host "Hilfe zum Rollout-Skript:`n"
-               "Private: Dateien werden nur nach `"Scripts`" kopiert."
-               "NoUSB: Dateien werden nicht zum Tools-USB kopiert. (Private darf nicht angegeben sein)"
-               "-------"
-               "NoDeployToProfile: Die Änderungen werden nicht zum aktuellen Profil augerollt."
-               "-------"
-               "CommitMessage: Die Nachricht für den Commit."
-               "NoCommit: Keine Interaktion mit der Repository wird durchgeführt."
-               "NoPush: Die Commits werden nicht zu Origin gepusht."
-               "-------"
-               "Help: Drucke Hilfe aus."
+    Write-Host "Private: Dateien werden nur nach `"Scripts`" kopiert."
+    Write-Host "NoUSB: Dateien werden nicht zum Tools-USB kopiert. (Private darf nicht angegeben sein)"
+    Write-Host "-------"
+    Write-Host "NoDeployToProfile: Die Änderungen werden nicht zum aktuellen Profil augerollt."
+    Write-Host "-------"
+    Write-Host "CommitMessage: Die Nachricht für den Commit."
+    Write-Host "NoCommit: Keine Interaktion mit der Repository wird durchgeführt."
+    Write-Host "NoPush: Die Commits werden nicht zu Origin gepusht."
+    Write-Host "-------"
+    Write-Host "Help: Drucke Hilfe aus."
 
     return
 }

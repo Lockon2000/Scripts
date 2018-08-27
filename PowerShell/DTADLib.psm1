@@ -134,22 +134,40 @@ function New-NamedClientSession {
     if ($sess.Length -eq 0) {
         Write-Host "Keine der angegebenen Remote Session konnte hergestellt werden!!"
     } else {
-        Write-Host "Eine neue Remote Session wurde hergestellt und in der Variable `"sess`" gespeichert."
+        Write-Host "$($sess.Count) neue Remote Session wurde\n hergestellt und in der Variable `"sess`" gespeichert."
     }
 }
 
 function Invoke-ClientCommand {
-    param([Parameter(Position=0,ValueFromRemainingArguments=$true)] [string]$CmdString, [string[]]$Include)
-    if ($CmdString.Length -eq 0) {
+    param([Parameter(Position=0,ValueFromRemainingArguments=$true)] [string]$CmdInput, [string[]]$Include, [switch]$Assert)
+    if ($CmdInput.Length -eq 0) {
         Write-Host "Gib einen Ausdruck ein!!"
+        return
     } else {
+        $Cmd = [ScriptBlock]::Create($CmdInput)
+        [System.Collections.ArrayList]$global:producedOutput = @()
+        [System.Collections.ArrayList]$global:producedNoOutput = @()
+
         if (Test-Path Variable:global:sess) {
-            $Cmd = [ScriptBlock]::Create($CmdString)
             if ($Include.Length -ne 0) {
                 $NarrowedSession = Get-PSSession | Where ComputerName -in $Include
-                Invoke-Command -Session $NarrowedSession -ScriptBlock $Cmd
+                ($Output = Invoke-Command -Session $NarrowedSession -ScriptBlock $Cmd)
+                foreach ($PC in $Include) {
+                    if ($PC -in $Output.PSComputerName) {
+                        [void]$global:producedOutput.Add($PC)
+                    } else {
+                        [void]$global:producedNoOutput.Add($PC)
+                    }
+                }
             } else {
-                Invoke-Command -Session $sess -ScriptBlock $Cmd
+                ($Output = Invoke-Command -Session $sess -ScriptBlock $Cmd)
+                foreach ($PC in $sess.ComputerName) {
+                    if ($PC -in $Output.PSComputerName) {
+                        [void]$global:producedOutput.Add($PC)
+                    } else {
+                        [void]$global:producedNoOutput.Add($PC)
+                    }
+                }
             }
         } else {
             Write-Host "Du hast keine Session (sess) definiert!"
@@ -171,40 +189,65 @@ function Invoke-ClientCommand {
             }
             $global:sess = New-ClientSession @ncsnArgs
 
-            $Cmd = [ScriptBlock]::Create($CmdString)
             if ($Include.Length -ne 0) {
+                $NarrowedSession = Get-PSSession | Where ComputerName -in $Include
+                ($Output = Invoke-Command -Session $NarrowedSession -ScriptBlock $Cmd)
                 foreach ($PC in $Include) {
-                    $PCSession = Get-PSSession | Where ComputerName -eq $PC
-                    Invoke-Command -Session $PCSession -ScriptBlock $Cmd
+                    if ($PC -in $Output.PSComputerName) {
+                        [void]$global:producedOutput.Add($PC)
+                    } else {
+                        [void]$global:producedNoOutput.Add($PC)
+                    }
                 }
             } else {
-                Invoke-Command -Session $sess -ScriptBlock $Cmd
+                ($Output = Invoke-Command -Session $sess -ScriptBlock $Cmd)
+                foreach ($PC in $sess.ComputerName) {
+                    if ($PC -in $Output.PSComputerName) {
+                       [void]$global:producedOutput.Add($PC)
+                    } else {
+                        [void]$global:producedNoOutput.Add($PC)
+                    }
+                }
             }
         }
     }
+
+    if ($Assert) {
+        Assert-SuccessClientCommand
+    }
+    return
 }
 
 function Invoke-StructuredClientCommand {
-    param([Parameter(Position=0,ValueFromRemainingArguments=$true)] [string]$CmdString, [string[]]$Include)
-    if ($CmdString.Length -eq 0) {
+    param([Parameter(Position=0,ValueFromRemainingArguments=$true)] [string]$CmdInput, [string[]]$Include, [switch]$Assert)
+    if ($CmdInput.Length -eq 0) {
         Write-Host "Gib einen Ausdruck ein!!"
     } else {
-        if ($Include.Length -ne 0) {
-            $Outputs = Invoke-ClientCommand -Include $Include $CmdString | Group-Object -Property PSComputerName
-            foreach ($Output in $Outputs) {
-                $PCName = $Output.Name
-                Write-Output "`nErgebnisse von PC: $PCName"
-                $Output | Select -ExpandProperty Group
-            }
-        } else {
-            $Outputs = Invoke-ClientCommand $CmdString | Group-Object -Property PSComputerName
-            foreach ($Output in $Outputs) {
-                $PCName = $Output.Name
-                Write-Output "`nErgebnisse von PC: $PCName"
-                $Output | Select -ExpandProperty Group | Out-Default
-            
-            }
+        $Outputs = Invoke-ClientCommand -Include $Include $CmdInput | Group-Object -Property PSComputerName
+        foreach ($Output in $Outputs) {
+            $PCName = $Output.Name
+            Write-Output "`nErgebnisse von PC: $PCName"
+            $Output | Select -ExpandProperty Group | Out-Default
         }
+    }
+
+    if ($Assert) {
+        Assert-SuccessClientCommand
+    }
+    return
+}
+
+function Remove-ClientSession {
+    $sess | Remove-PSSession
+    Remove-Variable sess -Scope Global
+}
+
+function Assert-SuccessClientCommand {
+    if ($producedOutput.Count -eq $sess.count) {
+        Write-Host "Alle Remote PCs haben Output produziert!"
+    } else {
+        Write-Host "Folgende PCs haben keinen Output produziert:"
+        Write-Host "$producedNoOutput"
     }
 }
 
@@ -215,6 +258,8 @@ New-Alias ncsn -Value New-ClientSession
 New-Alias nncsn -Value New-NamedClientSession
 New-Alias iccm -Value Invoke-ClientCommand
 New-Alias isccm -Value Invoke-StructuredClientCommand
+New-Alias rmcsn -Value Remove-ClientSession
+New-Alias asccm -Value Assert-SuccessClientCommand
 
 
 Export-ModuleMember -Variable * -Function * -Alias *
