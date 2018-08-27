@@ -1,8 +1,7 @@
-$Cred = Import-Clixml -Path C:\Users\mabdelwahab\Arbeit\Administration\cred.xml
+$Cred = Import-Clixml -Path "C:\Users\$env:Username\Documents\WindowsPowerShell\cred.xml"
 $CredAdminDesktop = $Cred.Admin.Desktop
 $CredAdminLaptop = $Cred.Admin.Laptop
 $CredUser = $Cred.User
-$CredMAbdelwahab = $Cred.MAbdelwahab
 $Departments = (Dir "\\odin\it\admin\Skripte\PowerShell Clients" | Foreach-Object {($_.name[7..($_.name.Length-5)] -join "").ToLower()})
 
 Remove-Variable Cred
