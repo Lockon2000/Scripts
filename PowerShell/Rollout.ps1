@@ -27,7 +27,7 @@ Copy-Item -Path "C:\Users\mabdelwahab\Arbeit\PowerShell-Skripte\*" -Destination 
 if (-not $Private) {
     Copy-Item -Path "C:\Users\mabdelwahab\Arbeit\PowerShell-Skripte\*" -Destination "\\odin\it\admin\Skripte" -Exclude "README.md","Microsoft.PowerShell_profile.ps1","Rollout.ps1" -PassThru
     if (-not $NoUSB) {
-        Copy-Item -Path "C:\Users\mabdelwahab\Arbeit\PowerShell-Skripte\*" -Destination "D:\Skripte" -Exclude "README.md","Microsoft.PowerShell_profile.ps1","Rollout.ps1" -PassThru
+        Copy-Item -Path "C:\Users\mabdelwahab\Arbeit\PowerShell-Skripte\*" -Destination "D:\Skripte" -Exclude "README.md","Microsoft.PowerShell_profile.ps1","Rollout.ps1","*.psm1" -PassThru
     }
 }
 

@@ -41,5 +41,5 @@ ForEach ($drive in $drives) {
     $total2 = $total2 + $drive.FreeSpace
 }
 
-Write-Host Der freigegebene Speicherplatz betr√§gt (($total2 - $total1)/(1024*1024)) MBs `n
+Write-Host Der freigegebene Speicherplatz betr‰gt (($total2 - $total1)/(1024*1024)) MBs `n
 Pause

@@ -130,7 +130,12 @@ function New-NamedClientSession {
     param([string[]]$Include="all", [string]$PCType="all", [string[]]$Exclude)
 
     $global:sess = New-ClientSession -Include $Include -PCType $PCType -Exclude $Exclude
-    Write-Host "Eine neue Remote Session wurde hergestellt und in der Variable `"sess`" gespeichert."
+
+    if ($sess.Length -eq 0) {
+        Write-Host "Keine der angegebenen Remote Session konnte hergestellt werden!!"
+    } else {
+        Write-Host "Eine neue Remote Session wurde hergestellt und in der Variable `"sess`" gespeichert."
+    }
 }
 
 function Invoke-ClientCommand {
