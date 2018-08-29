@@ -2,14 +2,16 @@ $Cred = Import-Clixml -Path "C:\Users\$env:Username\Documents\WindowsPowerShell\
 $CredAdminDesktop = $Cred.Admin.Desktop
 $CredAdminLaptop = $Cred.Admin.Laptop
 $CredUser = $Cred.User
-$Departments = (Dir "\\odin\it\admin\Skripte\PowerShell Clients" | Foreach-Object {($_.name[7..($_.name.Length-5)] -join "").ToLower()})
 
 Remove-Variable Cred
 
 
 function Get-Client {
-    param([string[]]$Include="all", [string]$PCType="all", [string[]]$Exclude, [switch]$ReturnPCObj)
+    param([string[]]$Include="all", [ValidateSet("all","d","l")] [string]$PCType="all", [string[]]$Exclude, [switch]$ReturnPCObj)
     [System.Collections.ArrayList]$List = @()
+    if (-not (Test-Path variable:Departments)) {
+        $Departments = (Dir "\\odin\it\admin\Skripte\PowerShell Clients" | Foreach-Object {($_.name[7..($_.name.Length-5)] -join "").ToLower()})
+    }
 
     if ("all" -in $Include) {
         foreach ($File in (Dir '\\odin\it\admin\Skripte\PowerShell Clients')) {
@@ -108,29 +110,61 @@ function Enter-ClientSession {
 }
 
 function New-ClientSession {
-    param([string[]]$Include="all", [string]$PCType="all", [string[]]$Exclude)
+    param([Parameter(Mandatory=$true)] [string[]]$Include, [ValidateSet("all","d","l")] [string]$PCType="all", [string[]]$Exclude, [switch]$Silent)
 
     if ($PCType -eq "all") {
         $Desktops = Get-Client -Include $Include -PCType "d" -Exclude $Exclude
         $Laptops = Get-Client -Include $Include -PCType "l" -Exclude $Exclude
 
-        if (($Desktops.Length -ne 0) -and ($Laptops.Length -ne 0)) {
-            return (New-PSSession -ComputerName $Desktops -Credential $CredAdminDesktop) + (New-PSSession -ComputerName $Laptops -Credential $CredAdminLaptop)
-        } elseif ($Desktops.Length -ne 0) {
-            return (New-PSSession -ComputerName $Desktops -Credential $CredAdminDesktop)
-        } else {
-            return (New-PSSession -ComputerName $Laptops -Credential $CredAdminLaptop)
-        }
+        if (($Desktops.Count -ne 0) -and ($Laptops.Count -ne 0)) {
+            $DesktopSessions = New-PSSession -ComputerName $Desktops -Credential $CredAdminDesktop
+            $LaptopSessions = New-PSSession -ComputerName $Laptops -Credential $CredAdminLaptop
 
+            $DesktopSessions + $LaptopSessions
+        } elseif ($Desktops.Count -ne 0) {
+            $DesktopSessions = New-PSSession -ComputerName $Desktops -Credential $CredAdminDesktop
+
+            $DesktopSessions
+        } else {
+            $LaptopSessions = New-PSSession -ComputerName $Laptops -Credential $CredAdminLaptop
+
+            $LaptopSessions
+        }
+    } elseif ($PCType -eq "d") {
+        $Desktops = Get-Client -Include $Include -PCType "d" -Exclude $Exclude
+
+        if ($Desktops.Count -ne 0) {
+            $DesktopSessions = New-PSSession -ComputerName $Desktops -Credential $CredAdminDesktop
+
+            $DesktopSessions
+        }
+    } else {
+        $Laptops = Get-Client -Include $Include -PCType "l" -Exclude $Exclude
+
+        if ($Laptops.Count -ne 0) {
+            $LaptopSessions = New-PSSession -ComputerName $Laptops -Credential $CredAdminLaptop
+
+            $LaptopSessions
+        }
     }
+
+    if (-not $Silent) {
+        if ($DesktopSessions.Count + $LaptopSessions.Count -eq 0) {
+            Write-Host "Keine der angegebenen Remote Session konnte hergestellt werden!!"
+        } else {
+            Write-Host "$($DesktopSessions.Count + $LaptopSessions.Count) neue Remote Session wurde\n hergestellt und in der Variable `"sess`" gespeichert."
+        }
+    }
+
+    return
 }
 
 function New-NamedClientSession {
-    param([string[]]$Include="all", [string]$PCType="all", [string[]]$Exclude)
+    param([Parameter(Mandatory=$true)] [string[]]$Include, [ValidateSet("all","d","l")] [string]$PCType="all", [string[]]$Exclude)
 
-    $global:sess = New-ClientSession -Include $Include -PCType $PCType -Exclude $Exclude
+    $global:sess = New-ClientSession -Include $Include -PCType $PCType -Exclude $Exclude -Silent
 
-    if ($sess.Length -eq 0) {
+    if ($sess.Count -eq 0) {
         Write-Host "Keine der angegebenen Remote Session konnte hergestellt werden!!"
     } else {
         Write-Host "$($sess.Count) neue Remote Session wurde\n hergestellt und in der Variable `"sess`" gespeichert."
@@ -146,12 +180,23 @@ function Invoke-ClientCommand {
         $Cmd = [ScriptBlock]::Create($CmdInput)
         [System.Collections.ArrayList]$global:producedOutput = @()
         [System.Collections.ArrayList]$global:producedNoOutput = @()
+        New-Variable IncludeResolved -Scope Script -Force
 
         if (Test-Path Variable:global:sess) {
-            if ($Include.Length -ne 0) {
-                $NarrowedSession = Get-PSSession | Where ComputerName -in $Include
+            if ($Include.Count -ne 0) {
+                $script:IncludeResolved = Get-Client -Include $Include | Where {$_ -in (Get-PSSession).ComputerName}
+                $NarrowedSession = Get-PSSession | Where ComputerName -in $IncludeResolved
+                if ($NarrowedSession.Count -eq 0) {
+                    Write-Host "Nach Filterung sind keine PCs mehr übrig geblieben!!"
+
+                    if ($Assert) {
+                        Assert-SuccessClientCommand -NumberOfContactedPCs 0
+                    }
+
+                    return
+                }
                 ($Output = Invoke-Command -Session $NarrowedSession -ScriptBlock $Cmd)
-                foreach ($PC in $Include) {
+                foreach ($PC in $IncludeResolved) {
                     if ($PC -in $Output.PSComputerName) {
                         [void]$global:producedOutput.Add($PC)
                     } else {
@@ -188,10 +233,20 @@ function Invoke-ClientCommand {
             }
             $global:sess = New-ClientSession @ncsnArgs
 
-            if ($Include.Length -ne 0) {
-                $NarrowedSession = Get-PSSession | Where ComputerName -in $Include
+            if ($Include.Count -ne 0) {
+                $script:IncludeResolved = Get-Client -Include $Include | Where {$_ -in (Get-PSSession).ComputerName}
+                $NarrowedSession = Get-PSSession | Where ComputerName -in $IncludeResolved
+                if ($NarrowedSession.Count -eq 0) {
+                    Write-Host "Nach Filterung sind keine PCs mehr übrig geblieben!!"
+
+                    if ($Assert) {
+                        Assert-SuccessClientCommand -NumberOfContactedPCs 0
+                    }
+
+                    return
+                }
                 ($Output = Invoke-Command -Session $NarrowedSession -ScriptBlock $Cmd)
-                foreach ($PC in $Include) {
+                foreach ($PC in $IncludeResolved) {
                     if ($PC -in $Output.PSComputerName) {
                         [void]$global:producedOutput.Add($PC)
                     } else {
@@ -212,7 +267,11 @@ function Invoke-ClientCommand {
     }
 
     if ($Assert) {
-        Assert-SuccessClientCommand
+        if ($Include.Count -ne 0) {
+            Assert-SuccessClientCommand -NumberOfContactedPCs $IncludeResolved.Count
+        } else {
+            Assert-SuccessClientCommand -NumberOfContactedPCs $sess.Count
+        }
     }
     return
 }
@@ -231,7 +290,11 @@ function Invoke-StructuredClientCommand {
     }
 
     if ($Assert) {
-        Assert-SuccessClientCommand
+        if ($Include.Count -ne 0) {
+            Assert-SuccessClientCommand -NumberOfContactedPCs $IncludeResolved.Count
+        } else {
+            Assert-SuccessClientCommand -NumberOfContactedPCs $sess.Count
+        }
     }
     return
 }
@@ -242,20 +305,23 @@ function Remove-ClientSession {
 }
 
 function Assert-SuccessClientCommand {
-    if ($producedOutput.Count -eq $sess.count) {
-        Write-Host "Alle Remote PCs haben Output produziert!"
+    param([Int]$NumberOfContactedPCs)
+    if ($NumberOfContactedPCs -eq 0) {
+        Write-Host "`nEs wurden keine Hosts kontaktiert!"
+    } elseif ($producedOutput.Count -eq $NumberOfContactedPCs) {
+        Write-Host "`nAlle angegebenen Remote PCs haben Output produziert!"
     } else {
-        Write-Host "Folgende PCs haben keinen Output produziert:"
+        Write-Host "`nFolgende PCs haben keinen Output produziert:"
         Write-Host "$producedNoOutput"
     }
 }
 
 
-New-Alias gcli -Value Get-Client
+New-Alias gcli  -Value Get-Client
 New-Alias etcsn -Value Enter-ClientSession
-New-Alias ncsn -Value New-ClientSession
+New-Alias ncsn  -Value New-ClientSession
 New-Alias nncsn -Value New-NamedClientSession
-New-Alias iccm -Value Invoke-ClientCommand
+New-Alias iccm  -Value Invoke-ClientCommand
 New-Alias isccm -Value Invoke-StructuredClientCommand
 New-Alias rmcsn -Value Remove-ClientSession
 New-Alias asccm -Value Assert-SuccessClientCommand

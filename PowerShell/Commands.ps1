@@ -10,6 +10,13 @@ If (-Not $CurrentlyAdmin)
     Exit
 }
 
-# To change a service startup type: 0 for instantly and 1 for delayed
 
+# To change a service startup type: 0 for instantly and 1 for delayed
 Set-ItemProperty -Path "Registry::HKLM\System\CurrentControlSet\Services\theservice" -Name "DelayedAutostart" -Value 1 -Type DWORD
+
+
+# Chocolatey profile
+$ChocolateyProfile = "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+if (Test-Path($ChocolateyProfile)) {
+  Import-Module "$ChocolateyProfile"
+}
