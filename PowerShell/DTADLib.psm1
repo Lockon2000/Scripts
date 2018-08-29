@@ -184,7 +184,7 @@ function Invoke-ClientCommand {
 
         if (Test-Path Variable:global:sess) {
             if ($Include.Count -ne 0) {
-                $script:IncludeResolved = Get-Client -Include $Include | Where {$_ -in (Get-PSSession).ComputerName}
+                $script:IncludeResolved = Get-Client -Include $Include | Where {$_ -in ($sess).ComputerName}
                 $NarrowedSession = Get-PSSession | Where ComputerName -in $IncludeResolved
                 if ($NarrowedSession.Count -eq 0) {
                     Write-Host "Nach Filterung sind keine PCs mehr übrig geblieben!!"
@@ -234,7 +234,7 @@ function Invoke-ClientCommand {
             $global:sess = New-ClientSession @ncsnArgs
 
             if ($Include.Count -ne 0) {
-                $script:IncludeResolved = Get-Client -Include $Include | Where {$_ -in (Get-PSSession).ComputerName}
+                $script:IncludeResolved = Get-Client -Include $Include | Where {$_ -in ($sess).ComputerName}
                 $NarrowedSession = Get-PSSession | Where ComputerName -in $IncludeResolved
                 if ($NarrowedSession.Count -eq 0) {
                     Write-Host "Nach Filterung sind keine PCs mehr übrig geblieben!!"
