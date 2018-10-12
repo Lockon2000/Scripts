@@ -327,4 +327,3 @@ New-Alias rmcsn -Value Remove-ClientSession
 New-Alias asccm -Value Assert-SuccessClientCommand
 
 
-Export-ModuleMember -Variable * -Function * -Alias *
