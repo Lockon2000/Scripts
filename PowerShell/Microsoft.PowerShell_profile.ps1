@@ -8,6 +8,6 @@ New-Alias -Name time -Value Measure-Command
 
 
 function Prompt {
-    Write-Color -Text $env:username, "@", $env:computername, " ", (get-location), "`n" -Color Red,DarkCyan,Yellow,White,Green,White
+    Write-Color -Text $env:username, "@", $env:computername, " ", $ExecutionContext.SessionState.Path.CurrentLocation, "`n" -Color Red,DarkCyan,Yellow,White,Green,White
     "PS> "
 }
