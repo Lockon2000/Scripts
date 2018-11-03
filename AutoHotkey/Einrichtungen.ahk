@@ -7,11 +7,11 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; +----------------------------------------------------------------------+
 ; | ** Daily Hotkeys **                                                  |
 ; | F4: Hotkey to suspend the script                                     |
-; | Alt+W: Pin the active window on top of any other window              |
+; | Ctrl+Alt+W: Pin the active window on top of any other window         |
 ; | Ctrl+Alt+C: Add to the Clipboard                                     |
+; | Ctrl+Alt+N: Create a new file and run it with the associated program |
 ; | Ctrl+Alt+P: Launch PowerShell in Admin mode                          |
 ; | Ctrl+Alt+S: Launch Sublime Text                                      |
-; | Ctrl+Alt+N: Create a new file and run it with the associated program |
 ; | Ctrl+Shift+S: Open Clipboard with Sublime Text                       |
 ; |----------------------------------------------------------------------|
 ; | ** Debungging Hotkeys **                                             |
@@ -25,7 +25,7 @@ F4:: Suspend
 
 
 ; Alt+W: Pin the active window on top of any other window
-!w:: Winset, Alwaysontop, TOGGLE, A
+^!w:: Winset, Alwaysontop, TOGGLE, A
 
 
 ; Ctrl+Alt+C: Add to the Clipboard
