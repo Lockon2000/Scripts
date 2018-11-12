@@ -37,7 +37,7 @@ function Write-Color {
 function Read-Box {
     param([String]$Massege, [String]$Title, [String]$DefaultInput)
 
-    [void][Reflection.Assembly]::LoadWithPartialName('Microsoft.VisualBasic')
+    Add-Type -AssemblyName Microsoft.VisualBasic
 
     [Microsoft.VisualBasic.Interaction]::InputBox($Massege, $Title, $DefaultInput)
 }
