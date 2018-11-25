@@ -16,6 +16,13 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
+# Enable tab completion
+. ~/bash-scripts/git-completion.bash
+# Adds git prompt functionality
+. ~/bash-scripts/git-prompt.sh
+
+export GIT_PS1_SHOWDIRTYSTATE=1
+
 # colors
 red="\e[0;1;31m"
 orange="\e[0;38;5;172m"
@@ -31,7 +38,8 @@ trap 'echo -n -e "$reset"' DEBUG
 # '\u' adds the name of the current user to the prompt
 # '\H' adds the full hostname to the prompt
 # '\w' adds the name of the current directory
-export PS1="\[$red\]\u\[$orange\]@\[$yellow\]\H \[$green\]\w
+# '\$(__git_ps1)' git status prompt (generates a space before it even if empty)
+export PS1="\[$red\]\u\[$orange\]@\[$yellow\]\H \[$green\]\w \[$cyan\]\$(__git_ps1)
 \[$white\]$ "
 
 alias l="ls -laF"

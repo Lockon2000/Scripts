@@ -24,7 +24,7 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 F4:: Suspend
 
 
-; Alt+W: Pin the active window on top of any other window
+; Ctrl+Alt+W: Pin the active window on top of any other window
 ^!w:: Winset, Alwaysontop, TOGGLE, A
 
 
@@ -74,7 +74,7 @@ F4:: Suspend
     ; Clean up result
     FullPath := RegExReplace(FullPath, "(^.+?: )", "")
     StringReplace, FullPath, FullPath, `r, , all
-    ; End (get current paht) -------------
+    ; End (get current path) -------------
 
     ; Change working directory
     SetWorkingDir, %FullPath%
@@ -112,7 +112,7 @@ F4:: Suspend
 
 
 ; Ctrl+Alt+N: Create a new file and run it with the associated program
-; Only run when Windows Explorer or Desktop is active
+; Only create when Windows Explorer or Desktop is active
 ; Options:
 ; -s    to open the created file with sublime text regardless of its associated program
 ; -c    to just create a file without interacting with it any further
@@ -140,7 +140,7 @@ F4:: Suspend
     ; Clean up result
     FullPath := RegExReplace(FullPath, "(^.+?: )", "")
     StringReplace, FullPath, FullPath, `r, , all
-    ; End (get current paht) -------------
+    ; End (get current path) -------------
 
     ; Change working directory
     SetWorkingDir, %FullPath%
