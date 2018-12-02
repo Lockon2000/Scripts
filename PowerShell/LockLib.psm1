@@ -16,7 +16,7 @@ function Elevate-PSSession {
     
     if (-Not $CurrentlyAdmin)
     {
-        Start-Process powershell.exe -Verb runAs -ArgumentList "-NoExit -Command cd `"$PWD`""
+        Start-Process powershell.exe -Verb runAs -ArgumentList "-NoExit -Command cd '$PWD'"
         if (-not $Preserve) {
             Exit
         }
