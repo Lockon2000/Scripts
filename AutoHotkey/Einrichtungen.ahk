@@ -10,7 +10,7 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; | Ctrl+Alt+W: Pin the active window on top of any other window         |
 ; | Ctrl+Alt+C: Add to the Clipboard                                     |
 ; | Ctrl+Alt+N: Create a new file and run it with the associated program |
-; | Ctrl+Alt+P: Launch PowerShell in Admin mode                          |
+; | Ctrl+Alt+P: Launch PowerShell in Admin mode (disabled)               |
 ; | Ctrl+Alt+S: Launch Sublime Text                                      |
 ; | Ctrl+Shift+S: Open Clipboard with Sublime Text                       |
 ; |----------------------------------------------------------------------|
@@ -48,63 +48,63 @@ F4:: Suspend
     return
 
 
-; Ctrl+Alt+P: Hotkey to launch PowerShell in Admin mode
-; If an Explorer Window is active
-#IfWinActive ahk_class CabinetWClass
-^!p::
-#IfWinActive ahk_class ExploreWClass
-^!p::
-    ; Begin (get current path) -------------
-    ; Get full path from open Explorer window
-    WinGetText, FullPath, A
+; ; Ctrl+Alt+P: Hotkey to launch PowerShell in Admin mode - Disabled as of now I am using windows Builtin Shortcut
+; ; If an Explorer Window is active
+; #IfWinActive ahk_class CabinetWClass
+; ^!p::
+; #IfWinActive ahk_class ExploreWClass
+; ^!p::
+;     ; Begin (get current path) -------------
+;     ; Get full path from open Explorer window
+;     WinGetText, FullPath, A
 
-    ; Split up result (it returns paths seperated by newlines)
-    StringSplit, PathArray, FullPath, `n
+;     ; Split up result (it returns paths seperated by newlines)
+;     StringSplit, PathArray, FullPath, `n
     
-    ; Find line with backslash which is the path
-    Loop, %PathArray0%
-    {
-        StringGetPos, pos, PathArray%a_index%, \
-        if (pos > 0) {
-            FullPath:= PathArray%a_index%
-            break
-        }
-    }
+;     ; Find line with backslash which is the path
+;     Loop, %PathArray0%
+;     {
+;         StringGetPos, pos, PathArray%a_index%, \
+;         if (pos > 0) {
+;             FullPath:= PathArray%a_index%
+;             break
+;         }
+;     }
     
-    ; Clean up result
-    FullPath := RegExReplace(FullPath, "(^.+?: )", "")
-    StringReplace, FullPath, FullPath, `r, , all
-    ; End (get current path) -------------
+;     ; Clean up result
+;     FullPath := RegExReplace(FullPath, "(^.+?: )", "")
+;     StringReplace, FullPath, FullPath, `r, , all
+;     ; End (get current path) -------------
 
-    ; Change working directory
-    SetWorkingDir, %FullPath%
+;     ; Change working directory
+;     SetWorkingDir, %FullPath%
 
-    ; An error occurred with the SetWorkingDir directive
-    if ErrorLevel
-        Return
+;     ; An error occurred with the SetWorkingDir directive
+;     if ErrorLevel
+;         Return
 
-    ; Open the file in the appropriate editor
-    Run *RunAs C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -NoExit -Command "Set-Location '%FullPath%'"
+;     ; Open the file in the appropriate editor
+;     Run *RunAs C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -NoExit -Command "Set-Location '%FullPath%'"
 
-    Return
+;     Return
 
-; If the Desktop is active
-#IfWinActive ahk_class Progman
-^!p::
-#IfWinActive ahk_class WorkerW
-^!p::
-    ; Open the file in the appropriate editor
-    Run *RunAs C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -NoExit -Command "Set-Location 'C:\Users\%A_UserName%\Desktop'"
+; ; If the Desktop is active
+; #IfWinActive ahk_class Progman
+; ^!p::
+; #IfWinActive ahk_class WorkerW
+; ^!p::
+;     ; Open the file in the appropriate editor
+;     Run *RunAs C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe -NoExit -Command "Set-Location 'C:\Users\%A_UserName%\Desktop'"
 
-    Return
+;     Return
 
-; If anything else is active and also turn off context sensitivity
-#IfWinActive
-^!p::
-    ; Open the file in the appropriate editor
-    Run *RunAs C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe
+; ; If anything else is active and also turn off context sensitivity
+; #IfWinActive
+; ^!p::
+;     ; Open the file in the appropriate editor
+;     Run *RunAs C:\Windows\system32\WindowsPowerShell\v1.0\powershell.exe
 
-    Return
+;     Return
 
 
 ; Ctrl+Alt+S: Launch Sublime Text
