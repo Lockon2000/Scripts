@@ -5,17 +5,17 @@ If (-Not $CurrentlyAdmin)
     Exit
 }
 
-$drives = Get-WmiObject win32_logicaldisk
-$total1 = 0
-ForEach ($drive in $drives) {
-    $total1 = $total1 + $drive.FreeSpace
+$Drives = Get-WmiObject win32_logicaldisk
+$TotalBefore = 0
+ForEach ($Drive in $Drives) {
+    $TotalBefore = $TotalBefore + $Drive.FreeSpace
 }
 
 If ((Get-Host).Version.Major -gt 2){
-    Remove-Item -Path $env:TEMP\* -Recurse -Force *>$null
-    Remove-Item -Path C:\Windows\Temp\* -Recurse -Force *>$null
-    Remove-Item -Path C:\Windows\SoftwareDistribution\Download\* -Recurse -Force *>$null
-    Remove-Item -Path C:\Windows\Prefetch\* -Recurse -Force *>$null
+    Remove-Item -Path '$env:TEMP\*' -Recurse -Force *>$null
+    Remove-Item -Path 'C:\Windows\Temp\*' -Recurse -Force *>$null
+    Remove-Item -Path 'C:\Windows\SoftwareDistribution\Download\*' -Recurse -Force *>$null
+    Remove-Item -Path 'C:\Windows\Prefetch\*' -Recurse -Force *>$null
     Remove-Item -Path 'C:\Windows\$NT*' -Recurse -Force *>$null
 
     vssadmin delete shadows /All /Quiet *>$null
@@ -23,10 +23,10 @@ If ((Get-Host).Version.Major -gt 2){
     cleanmgr /SAGERUN:1 | Out-Null
 }
 Else {
-    Remove-Item -Path $env:TEMP\* -Recurse -Force 
-    Remove-Item -Path C:\Windows\Temp\* -Recurse -Force
-    Remove-Item -Path C:\Windows\SoftwareDistribution\Download\* -Recurse -Force
-    Remove-Item -Path C:\Windows\Prefetch\* -Recurse -Force
+    Remove-Item -Path '$env:TEMP\*' -Recurse -Force 
+    Remove-Item -Path 'C:\Windows\Temp\*' -Recurse -Force
+    Remove-Item -Path 'C:\Windows\SoftwareDistribution\Download\*' -Recurse -Force
+    Remove-Item -Path 'C:\Windows\Prefetch\*' -Recurse -Force
     Remove-Item -Path 'C:\Windows\$NT*' -Recurse -Force
 
     vssadmin delete shadows /All /Quiet | Out-Null
@@ -35,11 +35,11 @@ Else {
 
 }
 
-$drives = Get-WmiObject win32_logicaldisk
-$total2 = 0
-ForEach ($drive in $drives) {
-    $total2 = $total2 + $drive.FreeSpace
+$Drives = Get-WmiObject win32_logicaldisk
+$TotalAfter = 0
+ForEach ($Drive in $Drives) {
+    $TotalAfter = $TotalAfter + $Drive.FreeSpace
 }
 
-Write-Host Der freigegebene Speicherplatz beträgt (($total2 - $total1)/(1024*1024)) MBs `n
+Write-Host Der freigegebene Speicherplatz beträgt (($TotalAfter - $TotalBefore)/(1024*1024)) MBs `n
 Pause
