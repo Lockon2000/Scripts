@@ -1,0 +1,55 @@
+CALL ZocSuppressOutput 1
+
+/* Check if the current session is connencted to begin with */
+OldTabindex = ZocSessionTab("GETCURRENTINDEX")
+IF ZocSessionTab("ISCONNECTED", OldTabindex) == "##NO##" THEN DO
+    CALL ZocMessageBox "Keine aktive Verbindung!", 1
+    EXIT
+END
+
+/* First check if the session is idle because ongoing output will
+   interfere with the extraction of the current working directory.*/
+CALL ZocTimeout 0.5
+timeout = ZocWaitIdle()
+IF timeout = 640 THEN DO
+    CALL ZocMessageBox "Aktive Verbindung ist beschäftigt. Kann den Pfad nicht extrahieren!!", 1
+    EXIT
+END
+
+/* Get the current working directory */
+CALL ZocSend 'pwd && echo "<E>"^M'
+n = 0
+DO FOREVER
+    timeout = ZocWaitLine()
+    IF timeout = 640 THEN DO
+        CALL ZocMessageBox "Keine Antwort erhalten!!", 1
+        EXIT
+    END
+    
+    line = ZocLastLine() 
+    IF line == "<E>" THEN LEAVE
+    n = n+1
+    data.n= line
+END
+
+/* The current working directory is the second entry in the array data,
+   the first being the command 'pwd' itself */
+CWD = data.2
+
+CALL ZocMenuEvent "Wieder verbinden"
+NewTabindex = ZocSessionTab("GETCOUNT")-1
+
+/* Wait untit the new session is connected or else you can't send commands */
+CALL ZocTimeout 1
+n = 0
+DO UNTIL ZocSessionTab("ISCONNECTED", NewTabindex) == "##YES##" | n = 15
+    /* Notice that the ZocWaitIdle function waits in the initial tab (The
+       Tab where the REXX-Script was called and is running. Our intention
+       is to waste time. I didn't find a function which just waits, so I
+       exploited the simplest one. */
+    CALL ZocWaitIdle(1)
+    n = n+1
+END
+
+
+CALL ZocSessionTab "SEND", NewTabindex, "cd "||CWD||"^M"
