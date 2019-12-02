@@ -33,7 +33,6 @@ choco install 'chocolateygui' `
               'filezilla' `
               'virtualbox' `
               'vagrant' `
-              'vagrant-manager' `
               'thunderbird' `
               'anaconda3' `
               'drawio' `
