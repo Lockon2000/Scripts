@@ -21,7 +21,6 @@ choco install 'chocolateygui' `
               'whatsapp' `
               'google-backup-and-sync' `
               'jdownloader' `
-              'afedteated' `
               'iobit-uninstaller' `
               'firefox' `
               'googlechrome' `
