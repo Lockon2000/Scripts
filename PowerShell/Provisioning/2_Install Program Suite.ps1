@@ -13,6 +13,7 @@ choco install 'chocolateygui' `
               'choco-cleaner' `
               'autohotkey' `
               'dual-monitor-tools' `
+              'microsoft-windows-terminal' `
               'hwinfo' `
               'cpu-z' `
               'gpu-z' `
@@ -26,16 +27,23 @@ choco install 'chocolateygui' `
               'googlechrome' `
               'opera' `
               'python' `
+              'nodejs' `
+              'sass' `
               'git' `
               'sublimetext3' `
               'sublimemerge' `
               'vscode' `
+              'pycharm' `
+              'webstorm' `
+              'clion-ide' `
               'filezilla' `
               'virtualbox' `
               'vagrant' `
               'thunderbird' `
               'anaconda3' `
+              'pgadmin4' `
               'drawio' `
+              'vlc' `
               'steam' `
               'origin' `
               'uplay' `
