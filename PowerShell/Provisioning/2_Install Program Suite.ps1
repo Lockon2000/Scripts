@@ -28,6 +28,7 @@ choco install 'chocolateygui' `
               'opera' `
               'python' `
               'nodejs' `
+              'php' ''
               'sass' `
               'git' `
               'sublimetext3' `
@@ -41,7 +42,7 @@ choco install 'chocolateygui' `
               'vagrant' `
               'thunderbird' `
               'anaconda3' `
-              'pgadmin4' `
+              'dbeaver' `
               'drawio' `
               'vlc' `
               'steam' `
