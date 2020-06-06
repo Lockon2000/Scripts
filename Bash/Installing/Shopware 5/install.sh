@@ -1,4 +1,4 @@
-cd shopware
+cd /srv/web/shopware
 
 ./psh.phar init
 
@@ -7,3 +7,6 @@ unzip -o test_images.zip
 
 sudo chown www-data:www-data -R .
 sudo chmod a+rwx -R .
+
+sudo systemctl restart apache2
+
