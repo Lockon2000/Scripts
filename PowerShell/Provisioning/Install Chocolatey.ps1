@@ -7,9 +7,9 @@ If (-Not $CurrentlyAdmin)
 }
 
 
-# Bypass the execution policy then download and invoke the installation script
-Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+# Download and invoke the installation script
+iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 # Pause, so as to observe results
 Pause
