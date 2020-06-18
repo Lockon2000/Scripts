@@ -2,7 +2,10 @@
 $CurrentlyAdmin = (New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 If (-Not $CurrentlyAdmin)
 {
-    Start-Process powershell.exe -Verb runAs -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    # Get the path to the currently running PowerShell version
+    $Path = (Get-Process -id $PID | Get-Item | Select -ExpandProperty Fullname)
+
+    Start-Process $Path -Verb runAs -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File `"$PSCommandPath`""
     Exit
 }
 
@@ -17,6 +20,7 @@ choco install -y 'choco-cleaner'
 choco install -y 'autohotkey'
 choco install -y 'microsoft-windows-terminal'
 choco install -y 'powershell-core' --install-arguments='"ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 REGISTER_MANIFEST=1"' 
+choco install -y 'powershell-preview' --install-arguments='"ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 REGISTER_MANIFEST=1"' 
 
 # Developement
 choco install -y 'python'

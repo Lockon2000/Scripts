@@ -1,7 +1,10 @@
 $CurrentlyAdmin = (New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 If (-Not $CurrentlyAdmin)
 {
-    Start-Process powershell.exe -Verb runAs -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File `"$PSCommandPath`""
+    # Get the path to the currently running PowerShell version
+    $Path = (Get-Process -id $PID | Get-Item | Select -ExpandProperty Fullname)
+
+    Start-Process $Path -Verb runAs -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File `"$PSCommandPath`""
     Exit
 }
 
