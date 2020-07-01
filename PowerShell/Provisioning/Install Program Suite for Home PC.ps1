@@ -22,6 +22,7 @@ choco install -y 'dual-monitor-tools'
 choco install -y 'microsoft-windows-terminal'
 choco install -y 'powershell-core' --install-arguments='"ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 REGISTER_MANIFEST=1"' 
 choco install -y 'powershell-preview' --install-arguments='"ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 REGISTER_MANIFEST=1"' 
+choco install -y 'cascadiafonts'
 
 # Developement
 choco install -y 'python'
