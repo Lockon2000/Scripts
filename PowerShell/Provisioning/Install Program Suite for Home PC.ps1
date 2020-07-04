@@ -11,7 +11,7 @@ If (-Not $CurrentlyAdmin)
 
 
 # Installation Step
-# It would be preferable  to make all the installation with just one command to get a better statistics at the end, but
+# It would be preferable  to make all the installation with just one command to get a better statistic at the end, but
 # I don't know a way to pass individual install and package arguments when installing several packages at once.
 
 # Core
@@ -46,6 +46,7 @@ choco install -y 'gimp'
 choco install -y 'thunderbird'
 choco install -y 'drawio'
 choco install -y 'vlc'
+choco install -y 'pdf24' -params '"/Basic"'
 
 # Browsers
 choco install -y 'firefox'
