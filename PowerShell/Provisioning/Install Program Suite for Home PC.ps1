@@ -19,32 +19,13 @@ choco install -y 'chocolateygui'
 choco install -y 'choco-cleaner'
 choco install -y 'autohotkey'
 choco install -y 'dual-monitor-tools'
-choco install -y 'microsoft-windows-terminal'
-choco install -y 'powershell-core' --install-arguments='"ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 REGISTER_MANIFEST=1"' 
-choco install -y 'powershell-preview' --install-arguments='"ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 REGISTER_MANIFEST=1"' 
-choco install -y 'cascadiafonts'
-
-# Developement
-choco install -y 'python'
-choco install -y 'nodejs'
-choco install -y 'php' 
-choco install -y 'sass'
-choco install -y 'git'
-choco install -y 'sublimetext3'
-choco install -y 'sublimemerge'
-choco install -y 'vscode'
-choco install -y 'filezilla'
-choco install -y 'heroku-cli'
 
 # Programs
 choco install -y '7zip'
-choco install -y 'whatsapp'
-choco install -y 'google-backup-and-sync'
-choco install -y 'jdownloader'
-choco install -y 'iobit-uninstaller'
 choco install -y 'gimp'
 choco install -y 'thunderbird'
 choco install -y 'drawio'
+choco install -y 'ipe'
 choco install -y 'vlc'
 choco install -y 'pdf24' -params '"/Basic"'
 
@@ -52,36 +33,28 @@ choco install -y 'pdf24' -params '"/Basic"'
 choco install -y 'firefox'
 choco install -y 'firefox-dev' --pre
 choco install -y 'googlechrome'
-choco install -y 'opera'
 
 # Hardware
 choco install -y 'hwinfo'
 choco install -y 'cpu-z'
 choco install -y 'gpu-z'
 
-# Virtualization
-choco install -y 'virtualbox'
-choco install -y 'vagrant'
-
-# Databases
-choco install -y 'dbeaver'
-
-# Scientific Researech
-choco install -y 'anaconda3'
-
 # Entertainment
 choco install -y 'steam'
 choco install -y 'origin'
 choco install -y 'uplay'
+choco install -y 'battle.net'
 
 
 # Pin down strongly auto updating packages
+choco pin add -n='thunderbird'
 choco pin add -n='firefox'
 choco pin add -n='firefox-dev'
 choco pin add -n='googlechrome'
-choco pin add -n='opera'
-choco pin add -n='thunderbird'
 choco pin add -n='steam'
+choco pin add -n='origin'
+choco pin add -n='uplay'
+choco pin add -n='battle.net'
 
 
 # Pause, so as to observe results
